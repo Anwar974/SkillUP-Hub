@@ -1,7 +1,7 @@
 import connectDB from '../db/connection.js';
 import categoriesRouter from './modules/category/category.router.js'
 import trainingRouter from './modules/training/training.router.js'
-
+import cors from 'cors'
 const initApp = (app,express) => {
     connectDB();
     app.use(cors());
