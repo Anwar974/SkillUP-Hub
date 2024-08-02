@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 
-export async function sendEmail(to,subject,html){
+// export async function sendEmail(to,subject,userName='', token){
+  export async function sendEmail(to,subject,templateFunction, templateData){
 
     const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -11,13 +12,17 @@ export async function sendEmail(to,subject,html){
         },
       });
 
+      const htmlContent = templateFunction(templateData);
+
       const info = await transporter.sendMail({
-        from: '"SkillUP HUB" <process.env.EMAILSENDER>', // sender address
+        from: `SkillUP HUB" <${process.env.EMAILSENDER}>`, // sender address
         to, // list of receivers
         subject, // Subject line
-        html, // html body
+        html:htmlContent, // html body
       });
 
       return info;
 
 }
+
+

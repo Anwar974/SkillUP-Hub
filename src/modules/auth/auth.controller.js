@@ -3,23 +3,37 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { sendEmail } from "../../ults/email.js";
 import { customAlphabet } from "nanoid";
+import { sendCodeTemplate, welcomeEmailTemplate } from "../../ults/emailTemplete.js";
 
 export const register = async (req, res)=>{
-    const {userName, email, password} =req.body;
-    const user = await userModel.findOne({ email});
+    const {userName,email,password} = req.body;
+  
+    if ( await userModel.findOne({ userName })) {
+        return res.status(400).json({ message: 'Username already in use' });
+    }
+
+    const hashedPassword= bcrypt.hashSync(password,parseInt(process.env.SALTROUND))
+    const createUser= await userModel.create({userName,email,password:hashedPassword})
+    const token = jwt.sign({email},process.env.CONFIRMSIGN)
+ 
     
-    if(user){
-        return res.status(409).json({message:"email alreday exists"});
-        }
-
-    const hashedPassword = bcrypt.hashSync(password,parseInt(process.env.SALTROUND));
-    const createUser = await userModel.create({userName, email, password:hashedPassword});
-
-    await sendEmail(email,'welcome',`<h2>Hello ya ${userName}</h2>`)
-    return res.status(201).json({massege:"success", user:createUser});
-
+    await sendEmail(email, 'Welcome', welcomeEmailTemplate, { userName, token });
+    return res.status(201).json({message:"success",user:createUser})
 
 }
+
+export const confirmEmail = async (req, res)=>{
+    try{
+    const token= req.params.token;
+    const decoded= jwt.verify(token,process.env.CONFIRMSIGN)
+ await userModel.findOneAndUpdate({email:decoded.email},{confirmEmail:true})
+ return res.status(200).json({message:"success"})
+} catch (error) {
+    res.status(400).json({ message: 'Invalid or expired token', error: error.message });
+}
+
+}
+
 export const login = async(req, res)=>{
     const {email, password} = req.body;
     const user = await userModel.findOne({email});
@@ -58,7 +72,9 @@ export const sendCode = async(req,res) => {
     if (!user){
         return res.status(404).json({message:"email not found"});
     }
-    await sendEmail(email, 'reset password',`<h2>${code}</h2>`)
+
+    await sendEmail(email, 'Password Reset Code', sendCodeTemplate,  {userName:user.userName,code});
+
     return res.status(200).json({message:"success"});
 
 }
@@ -70,7 +86,7 @@ export const forgotPassword = async(req,res) => {
     if (!user){
         return res.status(404).json({message:"email not found"});
     }
-    if (user.sendCode != code){
+    if (user.sendCode!= code){
         return res.status(400).json({message:"invalid code"});
     }
     user.password = await bcrypt.hash(password,parseInt(process.env.SALTROUND));

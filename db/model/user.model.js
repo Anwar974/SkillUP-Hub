@@ -25,12 +25,25 @@ const userSchema = new Schema({
     department:{
         type:String,
     },
-    contactInfo:{
-        type:String,
+    socialLinks: {
+        facebook: {
+            type: String,
+        },
+        linkedIn: {
+            type: String,
+        },
+        github: {
+            type: String,
+        },
+        
     },
     confirmEmail:{
         type:Boolean,
         default:false,
+    },
+    sendCode:{
+        type:String,
+        default:null,
     },
     gender:{
         type:String,
@@ -50,6 +63,7 @@ const userSchema = new Schema({
 },
 {
     timestamps:true,
+   
 });
 
 const userModel = model('User',userSchema);

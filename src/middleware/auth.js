@@ -1,5 +1,6 @@
 import jwt  from 'jsonwebtoken';
 import userModel from '../../db/model/user.model.js';
+
 export const roles = {
     Admin:'Admin',
     User:'User',
@@ -26,8 +27,6 @@ export const auth = (accessRole = [])=>{
             return res.status(404).json({massege: "User Not Found!"});
 
         } 
-        // return res.json(user);
-        //user.role = صلاحية المستخدم الحالي 
 
         if (!accessRole.includes(user.role)){
             return res.status(403).json({massege:"Not authorized user!"});
