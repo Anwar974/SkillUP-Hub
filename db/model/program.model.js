@@ -3,7 +3,6 @@ import mongoose, { Schema, Types, model } from "mongoose";
 const programSchema = new Schema({
     title:{
         type:String,
-        unique: true,
         required:true,
         trim: true,
         
@@ -13,6 +12,10 @@ const programSchema = new Schema({
         required:true,
     },
     description:{
+        type:String,
+        required:true,
+    },
+    company:{
         type:String,
         required:true,
     },
@@ -32,6 +35,10 @@ const programSchema = new Schema({
     endDate:{
         type:Date,
         required:true,
+    },
+    hasApplicationForm: {
+        type: Boolean,
+        default: true,
     },
     // status:{
     //     type:String,
@@ -56,21 +63,28 @@ const programSchema = new Schema({
     //     required:true,
 
     // },
-    createdBy:{type:Types.ObjectId, ref:'User'},
-    updatedBy:{type:Types.ObjectId, ref:'User'}
+    createdBy:{
+        type:Types.ObjectId,
+        ref:'User'
+    },
+    updatedBy:{
+        type:Types.ObjectId,
+        ref:'User'
+    },
+    
     
 },
 {
     timestamps:true,
-    // toJSON:{virtuals:true},
-    // toObject:{virtuals:true}
+    toJSON:{virtuals:true},
+    toObject:{virtuals:true}
 });
 
-// programSchema.virtual('reviews',{
-//     ref:'Review',
-//     localField:'_id',
-//     foreignField: 'programId'
-// })
+programSchema.virtual('review',{
+    ref:'Review',
+    localField:'_id',
+    foreignField: 'programId'
+})
 
 const programModel = model('Program',programSchema);
 export default programModel;

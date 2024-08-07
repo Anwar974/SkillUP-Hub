@@ -16,27 +16,6 @@ const userSchema = new Schema({
         type:String,
         required:true,
     },
-    image:{
-        type:Object,
-    },
-    phone:{
-        type:String,
-    },
-    department:{
-        type:String,
-    },
-    socialLinks: {
-        facebook: {
-            type: String,
-        },
-        linkedIn: {
-            type: String,
-        },
-        github: {
-            type: String,
-        },
-        
-    },
     confirmEmail:{
         type:Boolean,
         default:false,
@@ -59,7 +38,28 @@ const userSchema = new Schema({
         type:String,
         default:'User',
         enum:['User','Admin','Instructor']
-    }
+    },
+    image:{
+        type:Object,
+    },
+    phone:{
+        type:String,
+    },
+    department:{
+        type:String,
+    },
+    socialLinks: {
+        facebook: {
+            type: String,
+        },
+        linkedIn: {
+            type: String,
+        },
+        github: {
+            type: String,
+        },
+        
+    },
 },
 {
     timestamps:true,

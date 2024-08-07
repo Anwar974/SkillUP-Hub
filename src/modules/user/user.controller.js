@@ -31,8 +31,14 @@ export const createUser = async (req, res) => {
 };
 
 export const getUsers = async (req, res) => {
+    try{
     const users = await userModel.find({});
     return res.status(200).json({ message: "successs", users });
+}catch (err) {
+    return res
+        .status(500)
+        .json({ message: "Internal server error", error: err.message });
+}
 };
 
 export const getUserData = async (req, res) => {

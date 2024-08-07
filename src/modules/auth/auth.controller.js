@@ -6,6 +6,7 @@ import { customAlphabet } from "nanoid";
 import { sendCodeTemplate, welcomeEmailTemplate } from "../../ults/emailTemplete.js";
 
 export const register = async (req, res)=>{
+    
     const {userName,email,password} = req.body;
   
     if ( await userModel.findOne({ userName })) {

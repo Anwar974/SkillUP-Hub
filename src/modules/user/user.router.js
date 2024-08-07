@@ -10,7 +10,7 @@ import fileUpload, { fileType } from './../../ults/multer.js';
 
 const router = Router();
 
-router.get('/',auth(endpoints.getUsers), controller.getUsers);
+router.get('/',auth(endpoints.getUsers), asyncHandler(controller.getUsers) );
 router.get('/userData',auth(endpoints.userData), controller.getUserData);
 router.post('/create-user',auth(endpoints.createUser),validation(schema.createUserSchema),checkEmail,asyncHandler(controller.createUser) );
 router.patch('/:id',validation(schema.changeStatusSchema),auth(endpoints.changeUserStatus),asyncHandler(controller.changeUserStatus));
