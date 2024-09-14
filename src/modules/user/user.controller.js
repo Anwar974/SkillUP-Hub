@@ -51,7 +51,7 @@ export const changeUserStatus = async (req, res) => {
     const updatedUser = await userModel.findByIdAndUpdate(
         userId,
         { status },
-        { new: true }
+        // { new: true }
     );
     if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
@@ -145,13 +145,20 @@ export const editProfile = async (req, res) => {
 };
 
 export const deleteUser = async (req, res) => {
-    const user = await userModel.findByIdAndDelete(req.params.id);
-    if (!user) {
-        return res.status(404).json({ message: "User not found" });
+    try {
+        // Find the user by ID
+        const user = await userModel.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Update the user's status to "NotActive" instead of deleting
+        user.status = "NotActive";
+        await user.save();
+        
+        return res.status(200).json({ message: "User status updated to NotActive successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error", error: error.message });
     }
-    // Delete user's photo from Cloudinary if it exists
-    if (user.photo && user.photo.public_id) {
-        await cloudinary.uploader.destroy(user.photo.public_id);
-    }
-    return res.status(200).json({ message: "User deleted successfully" });
 };

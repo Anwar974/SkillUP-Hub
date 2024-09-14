@@ -48,47 +48,54 @@ export const postReview = async (req, res) => {
     }
 };
 
+export const updateReview = async (req, res) => {
+    try {
+        const { programId } = req.params;
+        const { rating, comment } = req.body;
+        const userId = req.user._id;
 
-// export const create = async(req,res) => {
+        // Check if the review exists for this user and program
+        const existingReview = await reviewModel.findOne({ userId, programId });
 
-//     const {productId}=req.params
-//     const {comment,rating}=req.body
+        if (!existingReview) {
+            return res.status(404).json({ message: "Review not found" });
+        }
+
+        // Update the review fields if they are provided
+        if (rating) existingReview.rating = rating;
+        if (comment) existingReview.comment = comment;
+        existingReview.updatedAt = new Date();
+
+        // Save the updated review
+        await existingReview.save();
+
+        return res.status(200).json({ message: "Review updated successfully", review: existingReview });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+};
 
 
-//     // const application = await orderModel.findOne({
-//     //     userId:req.user._id,
-//     //     status:'deliverd',
-//     //     "products.productId":productId
-//     // })
+export const deleteReview = async (req, res) => {
+    try {
+        const { programId } = req.params;
+        const userId = req.user._id;
 
-//     if(!order){
-//         return res.status(400).json({message:"cant review this order"})
-//     }
+        // Log inputs for debugging
+        console.log("User ID:", userId);
+        console.log("Program ID:", programId);
 
-//     const checkReview=await reviewModel.findOne({
-//         userId:req.user._id,
-//         productId:productId
-//     })
+        // Find and delete the review
+        const deletedReview = await reviewModel.findOneAndDelete({ userId, programId });
 
-//     if(checkReview){
-//         return res.status(409).json({message:"you already review "})
+        if (!deletedReview) {
+            return res.status(404).json({ message: "Review not found" });
+        }
 
-//     }
-
-//     if(req.file){
-//         const{secure_url,public_id}=await cloudinary.uploader.upload(req.file.path,
-//             {folder:`${process.env.APPNAME}`}
-//         )
-//         req.body.image={secure_url,public_id}
-//     }
-
-//     const review=await reviewModel.create({
-//         comment,rating,
-//         productId,userId:req.user._id,
-//         image:req.body.image
-//      })
-   
-
-// return res.status(201).json({message:"success",review})
-  
-// }
+        return res.status(200).json({ message: "Review deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+};

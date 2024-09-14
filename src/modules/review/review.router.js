@@ -7,5 +7,8 @@ import { asyncHandler } from '../../ults/catchError.js';
 const router = Router({mergeParams: true});
 
 router.post('/',auth(endpoints.create), asyncHandler(controller.postReview) );
+router.patch('/',auth(endpoints.create), asyncHandler(controller.updateReview));
+router.delete('/',auth(endpoints.create), asyncHandler(controller.deleteReview));
+
 
 export default router;

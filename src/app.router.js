@@ -18,7 +18,6 @@ const initApp = (app,express) => {
     app.use('/user', userRouter)
     app.use('/categories', categoriesRouter)
     app.use('/programs', programRouter)
-    
     app.use('/reviews', reviewRouter)
 
     

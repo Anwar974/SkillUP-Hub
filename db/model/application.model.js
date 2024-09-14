@@ -41,7 +41,7 @@ const applicationSchema = new Schema({
     studentId: {
         type: String,
         required: true,
-        unique: true
+        unique: false
     },
     major: {
         type: String,

@@ -23,20 +23,17 @@ export const auth = (accessRole = [])=>{
 
         }
         const user = await userModel.findById(decoded.id).select("userName role");
+        
         if(!user){
             return res.status(404).json({massege: "User Not Found!"});
-
         } 
 
         if (!accessRole.includes(user.role)){
             return res.status(403).json({massege:"Not authorized user!"});
         }
-        
+
         req.user = user;
         return next();
-            
-    
 
     }
-
 }
