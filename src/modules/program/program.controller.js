@@ -113,15 +113,25 @@ export const getPrograms = async (req, res, next) => {
   };
   
 
-export const getProgramById = async (req, res) => {
-    
+  export const getProgramById = async (req, res) => {
+    try {
+        const program = await programModel.findById(req.params.id)
+            .populate({
+                path: 'review',
+                populate: {
+                    path: 'userId', 
+                    select: 'name' 
+                }
+            });
 
-    const program = await programModel.findById(req.params.id);
-    if (!program) {
-        return res.status(404).json({ message: "Program not found" });
+        if (!program) {
+            return res.status(404).json({ message: "Program not found" });
+        }
+
+        res.status(200).json({ program });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-
-    res.status(200).json({ program });
 };
 
 export const updateProgram = async (req, res) => {
