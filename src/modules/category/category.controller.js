@@ -27,18 +27,24 @@ export const create = async(req,res) => {
 }
 }
 
-export const getAll = async(req,res) =>{
-    const categories = await categoryModel.find({}).populate([{
-        path:"createdBy",
-        select:'userName'
-    },
-    {
-    path:"updatedBy",
-    select:'userName'
+export const getAll = async (req, res) => {
+    try {
+        const categories = await categoryModel.find({}).populate([
+            {
+                path: "createdBy",
+                select: "userName"
+            },
+            {
+                path: "updatedBy",
+                select: "userName"
+            }
+        ]);
+        return res.status(200).json({ message: "success", categories });
+    } catch (error) {
+        return res.status(500).json({ message: "error", error });
     }
-]);
-    return res.status(200).json({message:"success",categories});
-}
+};
+
 
 export const getActive = async(req,res) =>{
     const categories = await categoryModel.find({status:'Active'}).select("name");

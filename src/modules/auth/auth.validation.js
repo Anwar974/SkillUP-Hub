@@ -3,14 +3,14 @@ import Joi from 'joi';
 export const registerSchema = Joi.object({
     userName: Joi.string().min(3).max(30).required(),
     email:Joi.string().email().required(),
-    password:Joi.string().pattern(/^[A-Z][a-z0-9]{3,20}$/),
+    password:Joi.string() .pattern(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d\W_]{3,20}$/).required(),
     confirmPassword:Joi.valid(Joi.ref('password')),
  })
 
  export const createUserSchema = Joi.object({
    userName: Joi.string().min(3).max(30).required(),
    email:Joi.string().email().required(),
-   password:Joi.string().pattern(/^[A-Z][a-z0-9]{3,20}$/),
+   password:Joi.string().pattern(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{3,20}$/),
    confirmPassword:Joi.valid(Joi.ref('password')),
    role: Joi.string().valid('Instructor').required() // Only 'instructor' is valid for admin user creation
 

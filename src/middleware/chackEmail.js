@@ -6,7 +6,7 @@ export const checkEmail=async(req,res,next)=>{
     const {email} = req.body;
     const user= await userModel.findOne({email})
     if(user){
-     return next(new AppError(`email already exist`,409))
+        return res.status(409).json({message: 'Email already exists'});
     }
     next();
 }

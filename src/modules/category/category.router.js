@@ -9,7 +9,7 @@ const router = Router();
 
 // router.use('/:id/subcategory',subcategoryRouter);
 router.post('/', fileUpload(fileType.image).single('image'),validation(schema.createCategorySchema) ,auth(endpoints.create),controller.create)
-router.get('/',auth(endpoints.get), controller.getAll);
+router.get('/', controller.getAll);
 router.get('/active',auth(endpoints.active), controller.getActive);
 router.get('/:id',validation(schema.getDetailsCategorySchema),auth(endpoints.active), controller.getDetails);
 router.patch('/:id',fileUpload(fileType.image).single('image'),validation(schema.updateCategorySchema),auth(endpoints.create), controller.update);

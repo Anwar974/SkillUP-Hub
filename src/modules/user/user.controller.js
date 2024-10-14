@@ -7,10 +7,7 @@ import cloudinary from "../../ults/cloudinary.js";
 import { confirmEmail } from "../auth/auth.controller.js";
 
 export const createUser = async (req, res) => {
-    const { userName, email, password, role } = req.body;
-    if (role !== "Instructor") {
-        return res.status(400).json({ message: "Invalid role" });
-    }
+    const { userName, email, password } = req.body;
     if (await userModel.findOne({ userName })) {
         return res.status(400).json({ message: "Username already in use" });
     }
@@ -22,7 +19,7 @@ export const createUser = async (req, res) => {
         userName,
         email,
         password: hashedPassword,
-        role,
+        role:'Instructor',
     });
     const token = jwt.sign({ email }, process.env.CONFIRMSIGN);
     await sendEmail(email, "Welcome", welcomeEmailTemplate, { userName, token });
