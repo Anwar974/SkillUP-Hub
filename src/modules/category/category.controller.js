@@ -1,6 +1,7 @@
 import slugify from "slugify";
 import categoryModel from "../../../db/model/category.model.js";
 import cloudinary from "../../ults/cloudinary.js";
+import { pagination } from "../../ults/pagination.js";
 
 
 export const create = async(req,res) => {
@@ -19,7 +20,7 @@ export const create = async(req,res) => {
     req.body.updatedBy = req.user._id;
 
     const category = await categoryModel.create(req.body)
-    return res.json({message:category});
+    return res.status(200).json({message:"success",category});
 
 } catch (error) {
     console.error("Error creating category:", error);
@@ -55,10 +56,57 @@ export const getName=async(req,res,next)=>{
     return res.status(200).json(req.params.name)
  }
 
-export const getDetails = async(req,res) =>{
-    const category = await categoryModel.findById(req.params.id);
-    return res.status(200).json({message:"success",category});
-}
+ export const getDetails = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { skip, limit } = pagination(req.query.page, req.query.limit);
+      
+      let programQuery = {};
+      
+      // Set up the search filter for programs
+      if (req.query.search) {
+        programQuery.$or = [
+          { title: { $regex: req.query.search, $options: "i" } },
+          { description: { $regex: req.query.search, $options: "i" } }
+        ];
+      }
+  
+      // Add any additional filters if needed (e.g., company or location)
+      if (req.query.company) {
+        programQuery.companyName = { $regex: req.query.company, $options: "i" };
+      }
+  
+      if (req.query.location) {
+        programQuery.location = { $regex: req.query.location, $options: "i" };
+      }
+  
+      // Find the category and apply program filtering
+      const category = await categoryModel.findById(id).populate({
+        path: 'programs',
+        match: programQuery,
+        options: {
+          skip: skip,
+          limit: limit,
+          sort: req.query.sort || 'title',
+        },
+        select: 'title description startDate endDate location mode companyName'
+      });
+  
+      if (!category) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+  
+      return res.status(200).json({ message: "success", category });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server Error" });
+    }
+  };
+  
+  
+  
+  
+
 
 export const update = async(req,res) =>{
 

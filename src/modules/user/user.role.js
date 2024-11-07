@@ -6,6 +6,6 @@ export const endpoints ={
     changeUserStatus : [roles.Admin],
     editProfile : [roles.Instructor],
     getUsers: [roles.Admin],
-    getUserData: [roles.Admin,roles.User]
-
+    getBookmarks: [roles.User],
+    userProfile:[roles.Admin, roles.Instructor, roles.User]
 }

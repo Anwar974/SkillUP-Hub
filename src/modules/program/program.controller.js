@@ -84,19 +84,13 @@ export const getPrograms = async (req, res, next) => {
       }
   
 
-       // Adding filters for company and location
-    if (req.query.company) {
-        queryObject.company = { $regex: req.query.company, $options: "i" };
-      }
-  
-      if (req.query.location) {
-        queryObject.location = { $regex: req.query.location, $options: "i" };
-      }
-
       
+
+      const count = await programModel.countDocuments(queryObject); // To get the count of filtered documents
+
       const mongoseQuery = programModel.find(queryObject).skip(skip).limit(limit);
   
-      const count = await programModel.countDocuments(queryObject); // To get the count of filtered documents
+      
       mongoseQuery.select(req.query.fields);
       let programs = await mongoseQuery.sort(req.query.sort);
   
@@ -106,11 +100,14 @@ export const getPrograms = async (req, res, next) => {
         };
       });
   
+
+
+      
       return res.status(200).json({ message: "success", count, programs });
     } catch (error) {
       next(error);
     }
-  };
+};
   
 
   export const getProgramById = async (req, res) => {
@@ -167,7 +164,38 @@ export const updateProgram = async (req, res) => {
     }
 };
 
+export const toggleBookmark = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user._id;
+  console.log(id)
+      const program = await programModel.findById(id);
+      if (!program) {
+        console.log(id)
 
+        return res.status(404).json({ message: "Program not no not found" });
+      }
+  
+      // Check if the user has already bookmarked this program
+      const user = await userModel.findById(userId);
+      const isBookmarked = user.bookmarkedPrograms.includes(id);
+  
+      if (isBookmarked) {
+        // If bookmarked, remove the bookmark
+        user.bookmarkedPrograms.pull(id);
+      } else {
+        // Otherwise, add it to bookmarks
+        user.bookmarkedPrograms.push(id);
+      }
+  
+      await user.save();
+      res.status(200).json({ message: isBookmarked ? 'Bookmark removed' : 'Program bookmarked' });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+  
 export const deleteProgram = async (req, res) => {
     const { id } = req.params;
     const program = await programModel.findById(id);

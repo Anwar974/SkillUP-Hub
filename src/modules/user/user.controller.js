@@ -39,10 +39,13 @@ export const getUsers = async (req, res) => {
 };
 
 export const getUserData = async (req, res) => {
-    const user = await userModel.findById(req.user._id);
-    return res.status(200).json({ message: "successs", user });
+    
+        const user = await userModel.findById(req.user._id); 
+        return res.status(200).json({ message: "success", user });
+    
 };
 export const changeUserStatus = async (req, res) => {
+
     const userId = req.params.id;
     const { status } = req.body; // Expecting 'active' or 'inactive' in the request body
     const updatedUser = await userModel.findByIdAndUpdate(
@@ -93,7 +96,6 @@ export const editProfile = async (req, res) => {
                 const token = jwt.sign({email},process.env.CONFIRMSIGN)
                 
                     const decoded = jwt.verify(token, process.env.CONFIRMSIGN);
-                    console.log('Decoded:', decoded);
         
 
             await sendEmail(email, 'Welcome', welcomeEmailTemplate, { userName: user.userName, token });
@@ -159,3 +161,14 @@ export const deleteUser = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 };
+
+export const getBookmarkedPrograms = async (req, res) => {
+    try {
+      const user = await userModel.findById(req.user._id).populate('bookmarkedPrograms');
+      res.status(200).json({ bookmarkedPrograms: user.bookmarkedPrograms });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+  
+  

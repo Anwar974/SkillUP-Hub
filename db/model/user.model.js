@@ -60,6 +60,12 @@ const userSchema = new Schema({
         },
         
     },
+    bookmarkedPrograms: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'Program',
+        },
+      ],
 },
 {
     timestamps:true,

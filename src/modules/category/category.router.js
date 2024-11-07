@@ -11,7 +11,7 @@ const router = Router();
 router.post('/', fileUpload(fileType.image).single('image'),validation(schema.createCategorySchema) ,auth(endpoints.create),controller.create)
 router.get('/', controller.getAll);
 router.get('/active',auth(endpoints.active), controller.getActive);
-router.get('/:id',validation(schema.getDetailsCategorySchema),auth(endpoints.active), controller.getDetails);
+router.get('/:id', controller.getDetails);
 router.patch('/:id',fileUpload(fileType.image).single('image'),validation(schema.updateCategorySchema),auth(endpoints.create), controller.update);
 router.delete('/:id',validation(schema.deleteCategorySchema),auth(endpoints.delete), controller.destroy);
 
