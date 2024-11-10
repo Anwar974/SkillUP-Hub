@@ -112,19 +112,21 @@ export const getApplicationsByProgram = async (req, res) => {
    
 };
 
-// export const getApplicationById = async (req, res) => {
-//     try {
-//         const { programId, id } = req.params;
-//         const application = await applicationModel.findOne({ _id: id, programId });
-//         if (!application) {
-//             return res.status(404).json({ message: "Application not found" });
-//         }
-//         return res.status(200).json({ application });
-//     } catch (error) {
-//         console.error(error);
-//         return res.status(500).json({ message: "Internal server error", error: error.message });
-//     }
-// };
+export const getApplicationById = async (req, res) => {
+    try { 
+        
+        const { programId } = req.params;
+        const application = await applicationModel.findOne({ programId,userId:req.user._id });
+
+        if (!application) {
+            return res.status(404).json({ message: "Application not found" });
+        }
+        return res.status(200).json({ application });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+};
 
 export const updateApplication = async (req, res) => {
     try {

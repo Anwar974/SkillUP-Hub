@@ -112,15 +112,17 @@ export const getPrograms = async (req, res, next) => {
 
   export const getProgramById = async (req, res) => {
     try {
+
+
         const program = await programModel.findById(req.params.id)
             .populate({
                 path: 'review',
                 populate: {
                     path: 'userId', 
-                    select: 'name' 
+                    select: 'userName' 
                 }
-            });
-
+            })
+                        
         if (!program) {
             return res.status(404).json({ message: "Program not found" });
         }

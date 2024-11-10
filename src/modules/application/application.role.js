@@ -6,6 +6,6 @@ export const endpoints ={
     update : [roles.User],
     updateStatus : [roles.Instructor],
     delete: [roles.User,roles.Instructor],
-    // active: [roles.User,roles.Instructor],
+    myApplication: [roles.User],
 
 }

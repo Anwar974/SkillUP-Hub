@@ -11,9 +11,6 @@ export const postReview = async (req, res) => {
 
         const application = await applicationModel.findOne({ userId, programId });
 
-        console.log(application
-        );
-
         if (!application) {
             
             return res.status(404).json({ message: "Application not found" });
