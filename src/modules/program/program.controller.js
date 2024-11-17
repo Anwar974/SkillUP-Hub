@@ -20,6 +20,11 @@ export const postProgram = async (req, res) => {
             return res.status(404).json({ message: "Category not found" });
         }
 
+        const checkCompany = await companyModel.findById(company);
+        if (!checkCompany) {
+            return res.status(404).json({ message: "Company not found" });
+        }
+
         // Check for duplicate programs with the same title, startDate, endDate, and userId
         const existingProgram = await programModel.findOne({
             title,
@@ -51,6 +56,8 @@ export const postProgram = async (req, res) => {
         });
 
         await program.save();
+
+        await program.populate('company');
 
         res.status(201).json({ message: "Program created successfully", program });
 } catch (error) {
@@ -89,11 +96,13 @@ export const getPrograms = async (req, res, next) => {
   
       
       mongoseQuery.select(req.query.fields);
+      mongoseQuery.populate('company'); 
       let programs = await mongoseQuery.sort(req.query.sort);
   
       programs = programs.map((program) => {
         return {
           ...program.toObject(),
+          companyImage: program.company ? program.company.image : null,
         };
       });
   
@@ -116,6 +125,9 @@ export const getPrograms = async (req, res, next) => {
                     select: 'userName' 
                 }
             })
+            .populate({
+              path: 'company',  // Populate the company field
+          });
                         
         if (!program) {
             return res.status(404).json({ message: "Program not found" });
@@ -137,11 +149,21 @@ export const updateProgram = async (req, res) => {
             return res.status(404).json({ message: "Program not found" });
         }
 
+        if (company && company !== program.company) {
+          const companyData = await companyModel.findOne({ companyName: company });
+          if (companyData) {
+              // Update program with the correct company data
+              program.company = companyData.companyName; // Update to the new company name
+              program.companyImage = companyData.image; // Assuming company image is stored in the company model as 'image'
+          } else {
+              return res.status(404).json({ message: "Company not found" });
+          }
+      }
+
         // Update fields only if they are provided
         if (title) program.title = title;
         if (description) program.description = description;
         if (location) program.location = location;
-        if (company) program.company = company; // Fixed assignment
         if (mode) program.mode = mode;
         if (startDate) program.startDate = new Date(startDate);
         if (endDate) program.endDate = new Date(endDate);
@@ -165,7 +187,7 @@ export const toggleBookmark = async (req, res) => {
       const { id } = req.params;
       const userId = req.user._id;
   console.log(id)
-      const program = await programModel.findById(id);
+      const program = await programModel.findById(id).populate('company', 'image');;
       if (!program) {
         console.log(id)
 
@@ -194,7 +216,7 @@ export const toggleBookmark = async (req, res) => {
   
 export const deleteProgram = async (req, res) => {
     const { id } = req.params;
-    const program = await programModel.findById(id);
+    const program = await programModel.findById(id).populate('company', 'image');;
     if (!program) {
         return res.status(404).json({ message: "Program not found" });
     }

@@ -15,9 +15,14 @@ const programSchema = new Schema({
         type:String,
         required:true,
     },
-    company:{
-        type:String,
-        required:true,
+    // company:{
+    //     type:String,
+    //     required:true,
+    // },
+    company: {
+        type: Types.ObjectId,
+        ref: 'Company', // Reference the Company model
+        required: true,
     },
     location:{
         type:String,
