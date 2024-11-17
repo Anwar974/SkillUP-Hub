@@ -11,7 +11,7 @@ import Joi from 'joi';
    startDate: Joi.date().required(),
    endDate: Joi.date().required(),
    hasApplicationForm: Joi.boolean().default(false),
-      categoryId: Joi.string().hex().length(24).required(),
+   categoryId: Joi.string().hex().length(24).required(),
 
  })
 

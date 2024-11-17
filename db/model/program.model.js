@@ -71,8 +71,6 @@ const programSchema = new Schema({
         type:Types.ObjectId,
         ref:'User'
     },
-    
-    
 },
 {
     timestamps:true,

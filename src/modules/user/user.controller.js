@@ -7,20 +7,25 @@ import cloudinary from "../../ults/cloudinary.js";
 import { confirmEmail } from "../auth/auth.controller.js";
 
 export const createUser = async (req, res) => {
+
     const { userName, email, password } = req.body;
+
     if (await userModel.findOne({ userName })) {
         return res.status(400).json({ message: "Username already in use" });
     }
+
     const hashedPassword = bcrypt.hashSync(
         password,
         parseInt(process.env.SALTROUND)
     );
+
     const createUser = await userModel.create({
         userName,
         email,
         password: hashedPassword,
         role:'Instructor',
     });
+
     const token = jwt.sign({ email }, process.env.CONFIRMSIGN);
     await sendEmail(email, "Welcome", welcomeEmailTemplate, { userName, token });
 
@@ -128,9 +133,6 @@ export const editProfile = async (req, res) => {
                         : user.socialLinks.github,
             };
         }
-        // console.log('Request Body:', req.body);
-        // console.log('Extracted Social Links:', socialLinks)
-
         await user.save();
 
         return res

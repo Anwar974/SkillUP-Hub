@@ -2,6 +2,7 @@ import mongoose, { Schema, Types, model } from "mongoose";
 import reviewModel from "./review.model.js";
 
 const applicationSchema = new Schema({
+
     status:{
         type:String,
         default:'Pending',
@@ -91,15 +92,9 @@ const applicationSchema = new Schema({
 },
 {
     timestamps:true,
-    // toJSON:{virtuals:true},
-    // toObject:{virtuals:true}
 });
 
-// reviewSchema.virtual('reviews',{
-//     ref:'Review',
-//     localField:'_id',
-//     foreignField: 'programId'
-// }));
+
 
 const applicationModel = model('Application',applicationSchema);
 export default applicationModel;

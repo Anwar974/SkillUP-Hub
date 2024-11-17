@@ -6,7 +6,7 @@ export const postApplication = async (req, res) => {
     try {
         const { programId } = req.params;
         const { arabicName, englishName, email, phone, studentId, major, gradeEnglish1, gradeEnglish2, gba,
-             hoursPassed, year, fieldTrainingsPassed, notes } = req.body;
+            hoursPassed, year, fieldTrainingsPassed, notes } = req.body;
 
         const program = await programModel.findById(programId);
         if (!program) {
@@ -19,6 +19,7 @@ export const postApplication = async (req, res) => {
         }
     
         const existingApplication = await applicationModel.findOne({ userId:req.user._id, programId });
+        
         if (existingApplication) {
             return res.status(400).json({ message: "You have already applied for this program" });
         }

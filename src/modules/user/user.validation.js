@@ -32,7 +32,7 @@ export const editProfileSchema = Joi.object({
         fieldname:Joi.string().required(),
         originalname:Joi.string().required(),
         encoding:Joi.string().required(),
-        mimetype:Joi.string().valid('image/png','image/jpeg','image/webp').required(),
+        mimetype:Joi.string().valid('image/png','image/jpeg','image/jpg','image/webp').required(),
         destination:Joi.string().required(),
         filename:Joi.string().required(),
         path:Joi.string().required(),

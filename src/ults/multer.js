@@ -1,7 +1,7 @@
 import multer from 'multer';
 
 export const fileType ={
-    image :['image/png','image/jpeg','image/webp'],
+    image :['image/png','image/jpeg','image/webp','image/jpg',],
     pdf:['application/pdf']
 };
 function fileUpload(customTypes = []){

@@ -82,9 +82,6 @@ export const getPrograms = async (req, res, next) => {
           { description: { $regex: req.query.search, $options: "i" } },
         ];
       }
-  
-
-      
 
       const count = await programModel.countDocuments(queryObject); // To get the count of filtered documents
 
@@ -100,9 +97,6 @@ export const getPrograms = async (req, res, next) => {
         };
       });
   
-
-
-      
       return res.status(200).json({ message: "success", count, programs });
     } catch (error) {
       next(error);

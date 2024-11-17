@@ -4,6 +4,8 @@ import programRouter from './modules/program/program.router.js'
 import authRouter from './modules/auth/auth.router.js'
 import userRouter from './modules/user/user.router.js'
 import reviewRouter from './modules/review/review.router.js'
+import companyRouter from './modules/company/company.router.js'
+
 
 import cors from 'cors'
 const initApp = (app,express) => {
@@ -22,6 +24,8 @@ const initApp = (app,express) => {
     app.use('/categories', categoriesRouter)
     app.use('/programs', programRouter)
     app.use('/reviews', reviewRouter)
+    app.use('/companies', companyRouter)
+
 
     
     app.use('*', (req,res) =>{
