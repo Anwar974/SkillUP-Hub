@@ -3,6 +3,9 @@ import categoryModel from '../../../db/model/category.model.js';
 import programModel from "../../../db/model/program.model.js";
 import slugify from "slugify";
 import { pagination } from "../../ults/pagination.js";
+import companyModel from "../../../db/model/company.modal.js";
+import mongoose from "mongoose";
+
 
 export const postProgram = async (req, res) => {
 
@@ -67,50 +70,65 @@ export const postProgram = async (req, res) => {
 };
 
 export const getPrograms = async (req, res, next) => {
-    try {
-      const { skip, limit } = pagination(req.query.page, req.query.limit);
-      let queryObject = { ...req.query };
-      const excludeQuery = ["page", "limit", "sort", "search", "fields"];
-  
-      excludeQuery.forEach((ele) => {
-        delete queryObject[ele];
-      });
-  
-      queryObject = JSON.stringify(queryObject);
-      queryObject = queryObject.replace(
-        /\b(gt|gte|lt|lte|in|nin|eq)\b/g,
-        (match) => `$${match}`
-      );
-      queryObject = JSON.parse(queryObject);
-  
-      if (req.query.search) {
-        queryObject.$or = [
-          { title: { $regex: req.query.search, $options: "i" } },
-          { description: { $regex: req.query.search, $options: "i" } },
-        ];
-      }
+  try {
+    const { skip, limit } = pagination(req.query.page, req.query.limit);
+    let queryObject = { ...req.query };
+    const excludeQuery = ["page", "limit", "sort", "search", "fields"];
 
-      const count = await programModel.countDocuments(queryObject); // To get the count of filtered documents
+    excludeQuery.forEach((ele) => {
+      delete queryObject[ele];
+    });
 
-      const mongoseQuery = programModel.find(queryObject).skip(skip).limit(limit);
-  
-      
-      mongoseQuery.select(req.query.fields);
-      mongoseQuery.populate('company'); 
-      let programs = await mongoseQuery.sort(req.query.sort);
-  
-      programs = programs.map((program) => {
-        return {
-          ...program.toObject(),
-          companyImage: program.company ? program.company.image : null,
-        };
-      });
-  
-      return res.status(200).json({ message: "success", count, programs });
-    } catch (error) {
-      next(error);
+    queryObject = JSON.stringify(queryObject);
+    queryObject = queryObject.replace(
+      /\b(gt|gte|lt|lte|in|nin|eq)\b/g,
+      (match) => `$${match}`
+    );
+    queryObject = JSON.parse(queryObject);
+
+    if (req.query.search) {
+      queryObject.$or = [
+        { title: { $regex: req.query.search, $options: "i" } },
+        { description: { $regex: req.query.search, $options: "i" } },
+      ];
     }
+    
+    // Handling modes filter
+    if (req.query.modes) {
+      queryObject.mode = { $in: req.query.modes.split(",") };
+    }
+
+
+    const count = await programModel.countDocuments(queryObject);  // To get the count of filtered documents
+
+    const mongoseQuery = programModel.find(queryObject)
+      .skip(skip)
+    .limit(limit)
+    .populate('company')  
+    .populate('categoryId')  
+
+    mongoseQuery.select(req.query.fields);
+    mongoseQuery.populate("company");
+
+
+    let programs = await mongoseQuery.sort(req.query.sort);
+
+    programs = programs.map((program) => {
+      return {
+        ...program.toObject(),
+        companyImage: program.company ? program.company.image : null,
+      };
+    });
+
+    return res.status(200).json({ message: "success", count, programs });
+  } catch (error) {
+    next(error);
+  }
 };
+
+
+
+;
   
 
   export const getProgramById = async (req, res) => {
@@ -186,10 +204,8 @@ export const toggleBookmark = async (req, res) => {
     try {
       const { id } = req.params;
       const userId = req.user._id;
-  console.log(id)
       const program = await programModel.findById(id).populate('company', 'image');;
       if (!program) {
-        console.log(id)
 
         return res.status(404).json({ message: "Program not no not found" });
       }
