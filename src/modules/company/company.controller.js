@@ -25,6 +25,8 @@ export const postCopmany = async (req, res) => {
         req.body.createdBy = req.user._id;
         req.body.updatedBy = req.user._id;
 
+        
+
         if (req.body.socialLinks) {
             req.body.socialLinks = {
                 facebook: req.body.socialLinks.facebook !== undefined ? req.body.socialLinks.facebook : '',
@@ -33,8 +35,8 @@ export const postCopmany = async (req, res) => {
                 phoneNumber: req.body.socialLinks.phoneNumber !== undefined ? req.body.socialLinks.phoneNumber : ''
             };
         }
-
         
+        console.log("Parsed Body:", req.body);
 
         const company = await companyModel.create(req.body)
 

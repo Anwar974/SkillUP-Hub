@@ -16,6 +16,8 @@ const companySchema = new Schema({
     },
     description:{
         type:String,
+        required:false,
+
     },
     image:{
         type:Object,
