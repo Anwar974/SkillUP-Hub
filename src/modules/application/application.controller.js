@@ -152,7 +152,7 @@ export const updateApplication = async (req, res) => {
 export const updateApplicationStatus = async (req, res) => {
 
     const { programId, id } = req.params;
-    const status  = req.body; 
+    const {status}  = req.body; 
     const application = await applicationModel.findOneAndUpdate({ _id: id, programId }, { status }, { new: true });
     if (!application) {
         return res.status(404).json({ message: "Application not found" });
