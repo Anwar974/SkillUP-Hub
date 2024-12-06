@@ -62,54 +62,54 @@ export const getApplicationsByProgram = async (req, res) => {
     
     const { programId } = req.params;
     const { skip, limit } = ApplicationsPagination(req.query.page, req.query.limit);
-
+  
     let queryObject = { ...req.query };
     const excludeQuery = ["page", "limit", "sort", "search"];
   
     excludeQuery.forEach((ele) => {
         delete queryObject[ele];
     });
-
-  queryObject = JSON.stringify(queryObject);
-      queryObject = queryObject.replace(
-        /\b(gt|gte|lt|lte|in|nin|eq)\b/g,
-        (match) => `$${match}`
-      );
-      queryObject = JSON.parse(queryObject);
   
-      if (req.query.search) {
-        queryObject.$or = [
-          { arabicName: { $regex: req.query.search, $options: "i" } },
-          { englishName: { $regex: req.query.search, $options: "i" } },
-          { studentId: { $regex: req.query.search, $options: "i" } },
-        ];
-      }
-
+    queryObject = JSON.stringify(queryObject);
+    queryObject = queryObject.replace(
+      /\b(gt|gte|lt|lte|in|nin|eq)\b/g,
+      (match) => `$${match}`
+    );
+    queryObject = JSON.parse(queryObject);
+  
+    if (req.query.search) {
+      queryObject.$or = [
+        { arabicName: { $regex: req.query.search, $options: "i" } },
+        { englishName: { $regex: req.query.search, $options: "i" } },
+        { studentId: { $regex: req.query.search, $options: "i" } },
+      ];
+    }
+  
     if (req.query.status) {
-        queryObject.status = { $regex: req.query.status, $options: "i" };
-      }
+      queryObject.status = { $regex: req.query.status, $options: "i" };
+    }
   
     if (req.query.year) {
-        queryObject.year = { $regex: req.query.year, $options: "i" };
+      queryObject.year = { $regex: req.query.year, $options: "i" };
     }
     if (req.query.fieldTrainingsPassed) {
         queryObject.fieldTrainingsPassed = { $regex: req.query.fieldTrainingsPassed, $options: "i" };
     }
-
+  
     const mongoseQuery = applicationModel.find(queryObject).skip(skip).limit(limit);
   
     const count = await applicationModel.countDocuments(queryObject); // To get the count of filtered documents
     // mongoseQuery.select(req.query.fields);
     let applications = await mongoseQuery.sort(req.query.sort);
-
+  
     applications = applications.map((application) => {
       return {
         ...application.toObject(),
       };
     });
-
-    return res.status(200).json({ message: "success", count, applications });
-
+  
+      return res.status(200).json({ message: "success", count, applications });
+  
    
 };
 
@@ -150,41 +150,52 @@ export const updateApplication = async (req, res) => {
 };
 
 export const updateApplicationStatus = async (req, res) => {
+
+    const { programId, id } = req.params;
+    const status  = req.body; 
+    const application = await applicationModel.findOneAndUpdate({ _id: id, programId }, { status }, { new: true });
+    if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+    }
+
+     // Prevent changing from Accepted to Pending if enrollmentStatus is not Off Track
+     if (application.status === 'Accepted' && status === 'Pending' && application.enrollmentStatus !== 'Off Track') {
+        return res.status(400).json({ message: "Cannot change status from Accepted to Pending when enrollment status is not Off Track" });
+    }
+
+    // Update the status as requested
+    application.status = status;
     
-        const { programId, id } = req.params;
-        const status= req.body;
-        const application = await applicationModel.findOneAndUpdate({ _id: id, programId }, status, { new: true });
-        if (!application) {
-            return res.status(404).json({ message: "Application not found" });
-        }
+    if (status === 'Accepted') {
+        application.enrollmentStatus = 'Enrolled';
+        await application.save();
+    }
 
-        // application.status = status;
-
-        // if (status == 'Accepted') {
-        //     application.enrollmentStatus = 'Enrolled';
-        // }
-
-        // await application.save();
-
-        return res.status(200).json({ message: "Application status updated successfully", application });
-
-
-    
+    return res.status(200).json({ message: "success", application });
 };
 export const updateEnrollmentStatus = async (req, res) => {
-        const { id } = req.params;
-        const { enrollmentStatus } = req.body;
+    const { id } = req.params;
+    const { enrollmentStatus } = req.body; 
+    const application = await applicationModel.findById(id);
+    if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+    }
 
-        const application = await applicationModel.findById(id);
-        if (!application) {
-            return res.status(404).json({ message: "Application not found" });
+    if (application.status === 'Pending') {
+        if (enrollmentStatus !== 'Off Track' || enrollmentStatus !== 'Enrolled') {
+            return res.status(400).json({ message: `Student cannot be ${enrollmentStatus} when application is still pending` });
         }
-
+    } else if (application.status === 'Rejected') {
+        return res.status(400).json({ message: "Cannot change enrollment status when application is Rejected" });
+    } else if (application.status === 'Accepted') {
         application.enrollmentStatus = enrollmentStatus;
         await application.save();
+        return res.status(200).json({ message: "success", application });
+    }
+    application.enrollmentStatus = enrollmentStatus;
+    await application.save();
 
-        return res.status(200).json({ message: "Enrollment status updated successfully", application });
-    
+    return res.status(200).json({ message: "success", application });
 };
 
 export const deleteByStatus = async (req, res) => {
