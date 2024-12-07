@@ -27,7 +27,7 @@ export const confirmEmail = async (req, res)=>{
     try{
     const token= req.params.token;
     const decoded= jwt.verify(token,process.env.CONFIRMSIGN)
- await userModel.findOneAndUpdate({email:decoded.email},{confirmEmail:true})
+ await userModel.findOneAndUpdate({email:decoded.email},{confirmEmail:true},{ new: true } )
  return res.redirect(`http://localhost:5173/email-confirmation?status=success`);
 } catch (error) {
     res.status(400).json({ message: 'Invalid or expired token', error: error.message });
