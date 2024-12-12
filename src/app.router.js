@@ -10,25 +10,10 @@ import companyRouter from './modules/company/company.router.js'
 import cors from 'cors'
 const initApp = (app,express) => {
     connectDB();
-    // Allow specific origins
-const allowedOrigins = [
-    'http://localhost:5173', // For local development
-    'https://skillup-front.onrender.com', // Deployed frontend
-  ];
-  
-  const corsOptions = {
-    origin: (origin, callback) => {
-      if (allowedOrigins.includes(origin) || !origin) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true, // Include cookies or authorization headers
-  };
-  
-  app.use(cors(corsOptions));
-    
+    app.use(cors({
+        origin: 'http://localhost:5173', // Allow the React app
+        credentials: true, // If you need to send cookies
+      }));
     app.use(express.json());
     app.get('/', (req,res)=>{
         return res.status(200).json({massage:"success"})
