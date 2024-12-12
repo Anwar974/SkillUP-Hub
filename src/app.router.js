@@ -10,10 +10,12 @@ import companyRouter from './modules/company/company.router.js'
 import cors from 'cors'
 const initApp = (app,express) => {
     connectDB();
+
     app.use(cors({
         origin: 'http://localhost:5173', // Allow the React app
         credentials: true, // If you need to send cookies
       }));
+
     app.use(express.json());
     app.get('/', (req,res)=>{
         return res.status(200).json({massage:"success"})

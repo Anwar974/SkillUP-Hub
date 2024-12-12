@@ -1,4 +1,3 @@
-import { optional } from "joi";
 import { Schema, model, Types } from "mongoose";
 
 const companySchema = new Schema({
@@ -17,7 +16,7 @@ const companySchema = new Schema({
     },
     description:{
         type:String,
-        optional:true,
+        required:false
 
     },
     image:{
