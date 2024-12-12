@@ -87,7 +87,7 @@ export const welcomeEmailTemplate = ({ userName, token }) => {
                 <img src="https://res.cloudinary.com/dh37z23kg/image/upload/v1721811232/Skill%20UP/images/20944101_tyfa7b.jpg" alt="Welcome Image" style="max-width: 100%; height: auto; border: 0;">
 
 <p>We’re excited to have you with us. Confirm your email by clicking the button below:</p>
-                <a href='https://graduation-project-umber.vercel.app/auth/confirmEmail/${token}' class='button'>Confirm Email</a>
+                <a href='http://localhost:3000/auth/confirmEmail/${token}' class='button'>Confirm Email</a>
             </div>
             <div class="footer">
                 &copy; ${new Date().getFullYear()} Our Service. All rights reserved. <br>

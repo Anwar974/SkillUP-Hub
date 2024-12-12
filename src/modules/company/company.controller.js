@@ -40,6 +40,9 @@ export const postCopmany = async (req, res) => {
 
         const company = await companyModel.create(req.body)
 
+        console.log("Request body:", req.body);
+        console.log("Uploaded file:", req.file);
+        
         return res.status(200).json({message:"success",company});
 
     } catch (error) {
