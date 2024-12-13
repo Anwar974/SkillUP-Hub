@@ -125,9 +125,11 @@ export const getCompanyById = async (req, res) => {
         }
 
         // Fetch associated programs and count
-        const programCount = await programModel.countDocuments({ company: company._id });
 
-        res.status(200).json({ company, programCount });
+        // Fetch associated programs for this company
+        const programs = await programModel.find({ company: company._id }).populate('categoryId');
+
+        res.status(200).json({ company, programs, programCount: programs.length });
         
     } catch (error) {
         res.status(500).json({ message: error.message });
