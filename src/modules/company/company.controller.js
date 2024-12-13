@@ -3,6 +3,7 @@ import express from 'express';
 import slugify from 'slugify';
 import cloudinary from "../../ults/cloudinary.js";
 import { pagination } from '../../ults/pagination.js';
+import programModel from '../../../db/model/program.model.js';
 
 
 export const postCopmany = async (req, res) => {
@@ -36,7 +37,6 @@ export const postCopmany = async (req, res) => {
             };
         }
         
-        console.log("Parsed Body:", req.body);
 
         const company = await companyModel.create(req.body)
 
@@ -51,75 +51,84 @@ export const postCopmany = async (req, res) => {
     }
 }
 
-export const getCpmpanies = async (req, res) => {
-    
-    try{
-
-    const { skip, limit } = pagination(req.query.page, req.query.limit);
-
+export const getCompanies = async (req, res, next) => {
+    try {
+      const { skip, limit } = pagination(req.query.page, req.query.limit);
+  
       let queryObject = { ...req.query };
       const excludeQuery = ["page", "limit", "sort", "search", "fields"];
-  
       excludeQuery.forEach((ele) => {
         delete queryObject[ele];
       });
   
-      queryObject = JSON.stringify(queryObject);
-      queryObject = queryObject.replace(
+      queryObject = JSON.stringify(queryObject).replace(
         /\b(gt|gte|lt|lte|in|nin|eq)\b/g,
         (match) => `$${match}`
       );
       queryObject = JSON.parse(queryObject);
-
+  
       if (req.query.search) {
-            queryObject.$or = [
-                { companyName: { $regex: req.query.search, $options: "i" } },
-                { description: { $regex: req.query.search, $options: "i" } },
-            ];
-        }
-
-        if (req.query.location) {
-            queryObject.location = { $regex: req.query.location, $options: "i" };
-        }
-        if (req.query.industry) {
-            queryObject.industry = { $regex: req.query.industry, $options: "i" };
-        }
-
-        const count = await companyModel.countDocuments(queryObject); // To get the count of filtered documents
-
-        const mongoseQuery = companyModel.find(queryObject).skip(skip).limit(limit);
+        queryObject.$or = [
+          { companyName: { $regex: req.query.search, $options: "i" } },
+          { description: { $regex: req.query.search, $options: "i" } },
+        ];
+      }
   
-      
-      mongoseQuery.select(req.query.fields);
-      let companies = await mongoseQuery.sort(req.query.sort);
+      if (req.query.location) {
+        queryObject.location = { $regex: req.query.location, $options: "i" };
+      }
   
-      companies = companies.map((company) => {
-        return {
-          ...company.toObject(),
-        };
+      if (req.query.industry) {
+        queryObject.industry = { $regex: req.query.industry, $options: "i" };
+      }
+  
+      const count = await companyModel.countDocuments(queryObject);
+  
+      // Fetch companies
+      let companies = await companyModel
+        .find(queryObject)
+        .skip(skip)
+        .limit(limit)
+        .sort(req.query.sort)
+        .select(req.query.fields);
+  
+      // Count programs for each company
+      const companiesWithProgramCounts = await Promise.all(
+        companies.map(async (company) => {
+          const programCount = await programModel.countDocuments({
+            company: company._id, // Ensure this matches your schema
+          });
+          return { ...company.toObject(), programCount };
+        })
+      );
+  
+      return res.status(200).json({
+        message: "success",
+        count,
+        companies: companiesWithProgramCounts,
       });
-
-      return res.status(200).json({ message: "success", count, companies });
-
     } catch (error) {
-        next(error);
+      next(error);
     }
-
-}
+  };
 
 export const getCompanyById = async (req, res) => {
     try {
         const company = await companyModel.findById(req.params.id)
             .populate({
                 path: 'createdBy',
-                select: 'userName image' 
+                select: 'userName image'
             })
-                        
+
         if (!company) {
             return res.status(404).json({ message: "Company not found" });
         }
 
-        res.status(200).json({ company });
+        // Fetch associated programs and count
+        const programCount = await programModel.countDocuments({ company: company._id });
+
+        res.status(200).json({ company, programCount });
+        
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

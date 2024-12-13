@@ -2,6 +2,7 @@ import slugify from "slugify";
 import categoryModel from "../../../db/model/category.model.js";
 import cloudinary from "../../ults/cloudinary.js";
 import { pagination } from "../../ults/pagination.js";
+import programModel from "../../../db/model/program.model.js";
 
 
 export const create = async(req,res) => {
@@ -40,7 +41,21 @@ export const getAll = async (req, res) => {
                 select: "userName"
             }
         ]);
-        return res.status(200).json({ message: "success", categories });
+                // Count the number of programs for each category
+                const categoriesWithProgramCount = await Promise.all(
+                    categories.map(async (category) => {
+                        const programCount = await programModel.countDocuments({
+                            categoryId: category._id // Assuming program has a categoryId field
+                        });
+        
+                        return {
+                            ...category.toObject(),
+                            programCount
+                        };
+                    })
+                );
+        
+                return res.status(200).json({ message: "success", categories: categoriesWithProgramCount });
     } catch (error) {
         return res.status(500).json({ message: "error", error });
     }
@@ -96,7 +111,10 @@ export const getName=async(req,res,next)=>{
         return res.status(404).json({ message: "Category not found" });
       }
   
-      return res.status(200).json({ message: "success", category });
+      // Fetch associated programs and count
+      const programCount = await programModel.countDocuments({ categoryId: category._id });
+
+      return res.status(200).json({ message: "success", category, programCount });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Server Error" });

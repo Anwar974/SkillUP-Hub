@@ -4,7 +4,8 @@ import programModel from "../../../db/model/program.model.js";
 import slugify from "slugify";
 import { pagination } from "../../ults/pagination.js";
 import companyModel from "../../../db/model/company.modal.js";
-import mongoose from "mongoose";
+import applicationModel from "../../../db/model/application.model.js";
+import reviewModel from "../../../db/model/review.model.js";
 
 
 export const postProgram = async (req, res) => {
@@ -101,26 +102,35 @@ export const getPrograms = async (req, res, next) => {
 
     const count = await programModel.countDocuments(queryObject);  // To get the count of filtered documents
 
-    const mongoseQuery = programModel.find(queryObject)
+    const mongooseQuery = programModel
+      .find(queryObject)
       .skip(skip)
-    .limit(limit)
-    .populate('company')  
-    .populate('categoryId')  
+      .limit(limit)
+      .populate("company") // Populate company data
+      .populate("categoryId") // Populate category data
+      .select(req.query.fields)
+      .sort(req.query.sort);
 
-    mongoseQuery.select(req.query.fields);
-    mongoseQuery.populate("company");
+    let programs = await mongooseQuery;
 
+     // Fetch application counts and attach to programs
+     const programsWithApplicationCounts = await Promise.all(
+      programs.map(async (program) => {
+        const applicationCount = await applicationModel.countDocuments({
+          programId: program._id,
+        });
+        return {
+          ...program.toObject(),
+          companyImage: program.company ? program.company.image : null,
+          applicationCount,
+        };
+      })
+    );
 
-    let programs = await mongoseQuery.sort(req.query.sort);
+    return res
+      .status(200)
+      .json({ message: "success", count, programs: programsWithApplicationCounts });
 
-    programs = programs.map((program) => {
-      return {
-        ...program.toObject(),
-        companyImage: program.company ? program.company.image : null,
-      };
-    });
-
-    return res.status(200).json({ message: "success", count, programs });
   } catch (error) {
     next(error);
   }
@@ -151,7 +161,11 @@ export const getPrograms = async (req, res, next) => {
             return res.status(404).json({ message: "Program not found" });
         }
 
-        res.status(200).json({ program });
+        // Fetch associated programs and count
+        const applicationsCount = await applicationModel.countDocuments({ programId: program._id });
+        const reviewsCount = await reviewModel.countDocuments({ programId: program._id });
+        res.status(200).json({ program, applicationsCount, reviewsCount });
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

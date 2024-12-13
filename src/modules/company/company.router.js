@@ -11,7 +11,7 @@ const router = Router();
 
 router.post('/',fileUpload(fileType.image).single('image'), validation(schema.postCompanySchema), auth(endpoints.post),
  asyncHandler(controller.postCopmany));
-router.get('/', asyncHandler(controller.getCpmpanies));
+router.get('/', asyncHandler(controller.getCompanies));
 router.get('/:id', asyncHandler(controller.getCompanyById));
 router.patch('/:id',fileUpload(fileType.image).single('image'), validation(schema.updateCompanySchema), auth(endpoints.update), controller.updateCompany);
 // router.delete('/:id', validation(schema.deleteCompanySchema),auth(endpoints.delete), controller.deleteCompany);
