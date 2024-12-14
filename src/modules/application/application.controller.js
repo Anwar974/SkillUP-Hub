@@ -63,13 +63,17 @@ export const getApplicationsByProgram = async (req, res) => {
     const { programId } = req.params;
     const { skip, limit } = ApplicationsPagination(req.query.page, req.query.limit);
   
+    
     let queryObject = { ...req.query };
+
     const excludeQuery = ["page", "limit", "sort", "search"];
   
     excludeQuery.forEach((ele) => {
         delete queryObject[ele];
     });
   
+    queryObject.programId = programId;
+
     queryObject = JSON.stringify(queryObject);
     queryObject = queryObject.replace(
       /\b(gt|gte|lt|lte|in|nin|eq)\b/g,
