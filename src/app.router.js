@@ -1,15 +1,13 @@
-import connectDB from '../db/connection.js';
 import categoriesRouter from './modules/category/category.router.js'
 import programRouter from './modules/program/program.router.js'
 import authRouter from './modules/auth/auth.router.js'
 import userRouter from './modules/user/user.router.js'
 import reviewRouter from './modules/review/review.router.js'
 import companyRouter from './modules/company/company.router.js'
-
-
 import cors from 'cors'
+
+
 const initApp = (app,express) => {
-    connectDB();
     app.use(express.json());
 // const allowedOrigins = ["http://localhost:5173","http://localhost:5174", "https://admindashboard-8bwy.onrender.com"];
 // app.use(cors({
@@ -26,7 +24,7 @@ const initApp = (app,express) => {
 //   preflightContinue: false
 // }));
 
-const allowedOrigins = ["http://localhost:5173", "https://graduation-project-rehw.onrender.com"];
+const allowedOrigins = ["http://localhost:5173","https://skillup-front.onrender.com"];
     app.use(cors({
           origin: (origin, callback) => {
             if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -40,8 +38,7 @@ const allowedOrigins = ["http://localhost:5173", "https://graduation-project-reh
           credentials: true, 
           preflightContinue: false
         }));
-
-    
+        
     app.get('/', (req,res)=>{
         return res.status(200).json({massage:"success"})
     })
