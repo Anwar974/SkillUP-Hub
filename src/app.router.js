@@ -43,7 +43,18 @@ const corsOptions = {
 
     app.use(cors(corsOptions));
     app.options('*', cors(corsOptions));
-        
+
+    app.use((req, res, next) => {
+        if (req.method === 'OPTIONS') {
+          res.header('Access-Control-Allow-Origin', req.headers.origin);
+          res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+          res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+          res.header('Access-Control-Allow-Credentials', 'true');
+          return res.sendStatus(200); // Respond OK to preflight requests
+        }
+        next();
+      });
+      
     app.get('/', (req,res)=>{
         return res.status(200).json({massage:"success"})
     })
