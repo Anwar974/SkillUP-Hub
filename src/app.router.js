@@ -10,26 +10,47 @@ import companyRouter from './modules/company/company.router.js'
 import cors from 'cors'
 const initApp = (app,express) => {
     connectDB();
-
-    app.use(cors({
-        origin: 'http://localhost:5173', // Allow the React app
-        credentials: true, // If you need to send cookies
-      }));
-
     app.use(express.json());
+// const allowedOrigins = ["http://localhost:5173","http://localhost:5174", "https://admindashboard-8bwy.onrender.com"];
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+//         callback(null, true);
+//       } else {
+//         callback(new Error('Not allowed by CORS'));
+//       }
+//   },
+//   methods: 'GET,POST,PUT,DELETE,HEAD,PATCH',
+//   allowedHeaders: 'Content-Type, Authorization',
+//   credentials: true, 
+//   preflightContinue: false
+// }));
+
+const allowedOrigins = ["http://localhost:5173", "https://graduation-project-rehw.onrender.com"];
+    app.use(cors({
+          origin: (origin, callback) => {
+            if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+                callback(null, true);
+              } else {
+                callback(new Error('Not allowed by CORS'));
+              }
+          },
+          methods: 'GET,POST,PUT,DELETE,HEAD,PATCH',
+          allowedHeaders: 'Content-Type, Authorization',
+          credentials: true, 
+          preflightContinue: false
+        }));
+
+    
     app.get('/', (req,res)=>{
         return res.status(200).json({massage:"success"})
     })
-
     app.use('/auth', authRouter)
     app.use('/user', userRouter)
     app.use('/categories', categoriesRouter)
     app.use('/programs', programRouter)
     app.use('/reviews', reviewRouter)
     app.use('/companies', companyRouter)
-
-
-    
     app.use('*', (req,res) =>{
         return res.status(404).json({massage: "page not found"});
     })
