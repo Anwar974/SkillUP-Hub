@@ -34,7 +34,7 @@ export const postProgram = async (req, res) => {
             title,
             startDate,
             endDate,
-            company
+            company,
         });
 
         if (existingProgram) {
@@ -48,7 +48,7 @@ export const postProgram = async (req, res) => {
             slug,
             description,
             company,
-            location,
+            location : location || undefined,
             mode,
             startDate,
             endDate,
@@ -93,11 +93,44 @@ export const getPrograms = async (req, res, next) => {
         { description: { $regex: req.query.search, $options: "i" } },
       ];
     }
+
+    if (req.query.company) {
+      const matchingCompany = await companyModel.findOne({
+        companyName: { $regex: req.query.company, $options: "i" },
+      });
     
+      if (matchingCompany) {
+        queryObject.company = matchingCompany._id;
+      } else {
+        queryObject.company = null;
+      }
+    }
+
+
+
     // Handling modes filter
     if (req.query.modes) {
       queryObject.mode = { $in: req.query.modes.split(",") };
     }
+    
+    // Status filter: past, active, or all
+if (req.query.status) {
+  const today = new Date();
+  const statusArray = req.query.status.split(","); // Convert comma-separated string to an array
+
+
+  statusArray.forEach(status => {
+    if (status === "past") {
+      queryObject.endDate = { $lt: today }; // Programs with endDate < today
+    } else if (status === "active") {
+      queryObject.endDate = { $gte: today }; // Programs with endDate >= today
+    }
+  });
+
+  // Remove the status field from queryObject as it's not needed in this case
+  delete queryObject.status;
+
+}
 
 
     const count = await programModel.countDocuments(queryObject);  // To get the count of filtered documents
@@ -135,11 +168,6 @@ export const getPrograms = async (req, res, next) => {
     next(error);
   }
 };
-
-
-
-;
-  
 
   export const getProgramById = async (req, res) => {
     try {

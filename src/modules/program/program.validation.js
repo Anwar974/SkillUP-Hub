@@ -6,7 +6,7 @@ import Joi from 'joi';
    title: Joi.string().required(),
    description: Joi.string().required(),
    company: Joi.string().required(),
-   location: Joi.string().required(),
+   location: Joi.string().optional(),
    mode: Joi.string().valid('online', 'offline', 'hybrid').default('offline'),
    startDate: Joi.date().required(),
    endDate: Joi.date().required(),

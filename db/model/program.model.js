@@ -26,7 +26,7 @@ const programSchema = new Schema({
     },
     location:{
         type:String,
-        required:true,
+        required:false,
     },
     mode:{
         type:String,
