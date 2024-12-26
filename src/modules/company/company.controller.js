@@ -161,8 +161,10 @@ export const updateCompany = async (req, res) => {
 
     if (companyName && companyName !== company.companyName) {
         if (await companyModel.findOne({ companyName })) {
-            return res.status(404).json({ message: "Username already in use" });
-        }
+            return res.status(404).json({ message: "Company name already in use" });
+        }else{
+          company.companyName=companyName;
+    }
     }
     company.slug = companyName ? slugify(companyName) : company.slug;
     company.updatedBy = req.user._id;

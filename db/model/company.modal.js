@@ -21,7 +21,7 @@ const companySchema = new Schema({
     },
     image:{
         type:Object,
-        required:true,
+        required:false,
     },
     locations:[
         {
