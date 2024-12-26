@@ -209,11 +209,10 @@ export const updateProgram = async (req, res) => {
             return res.status(404).json({ message: "Program not found" });
         }
 
-        if (company && company !== program.company) {
-          const companyData = await companyModel.findOne({ companyName: company });
+        if (company && company !== program.company.toString()) {
+          const companyData = await companyModel.findOne({ companyId: company });
           if (companyData) {
-              // Update program with the correct company data
-              program.company = companyData.companyName; // Update to the new company name
+              program.company = companyData.companyId; // Update to the new company name
               program.companyImage = companyData.image; // Assuming company image is stored in the company model as 'image'
           } else {
               return res.status(404).json({ message: "Company not found" });
