@@ -48,9 +48,15 @@ export const postApplication = async (req, res) => {
 
         await newApplication.save();
 
+        const totalApplications = await applicationModel.countDocuments();
+    const totalPages = Math.ceil(totalApplications / limit);
+
+
         return res.status(201).json({
             message: "Application created successfully",
             application: newApplication,
+            totalApplications,
+            totalPages
         });
     } catch (error) {
         console.error(error);

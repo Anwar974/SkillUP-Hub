@@ -87,6 +87,7 @@ export const getPrograms = async (req, res, next) => {
     );
     queryObject = JSON.parse(queryObject);
 
+
     if (req.query.search) {
       queryObject.$or = [
         { title: { $regex: req.query.search, $options: "i" } },
@@ -146,6 +147,10 @@ if (req.query.status) {
 
     let programs = await mongooseQuery;
 
+    
+    const totalPrograms = await programModel.countDocuments();
+    const totalPages = Math.ceil(totalPrograms / limit);
+
      // Fetch application counts and attach to programs
      const programsWithApplicationCounts = await Promise.all(
       programs.map(async (program) => {
@@ -162,7 +167,10 @@ if (req.query.status) {
 
     return res
       .status(200)
-      .json({ message: "success", count, programs: programsWithApplicationCounts });
+      .json({ message: "success", count, programs: programsWithApplicationCounts,
+        totalPrograms,
+        totalPages,
+        currentPage: parseInt(req.query.page) || 1, });
 
   } catch (error) {
     next(error);
@@ -210,16 +218,13 @@ export const updateProgram = async (req, res) => {
         }
 
         if (company && company !== program.company.toString()) {
-          const companyData = await companyModel.findOne({ companyId: company });
+          const companyData = await companyModel.findOne({ _id: company });
           if (companyData) {
-              program.company = companyData.companyId; // Update to the new company name
-              program.companyImage = companyData.image; // Assuming company image is stored in the company model as 'image'
+              program.company = companyData._id; // Update to the new company name
           } else {
               return res.status(404).json({ message: "Company not found" });
           }
       }
-
-        // Update fields only if they are provided
         if (title) program.title = title;
         if (description) program.description = description;
         if (location) program.location = location;

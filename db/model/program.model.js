@@ -15,13 +15,9 @@ const programSchema = new Schema({
         type:String,
         required:true,
     },
-    // company:{
-    //     type:String,
-    //     required:true,
-    // },
     company: {
         type: Types.ObjectId,
-        ref: 'Company', // Reference the Company model
+        ref: 'Company', 
         required: true,
     },
     location:{
@@ -62,12 +58,6 @@ const programSchema = new Schema({
         required:true,
 
     },
-    // subcategoryId:{
-    //     type:Types.ObjectId,
-    //     ref:'Subcategory',
-    //     required:true,
-
-    // },
     createdBy:{
         type:Types.ObjectId,
         ref:'User'

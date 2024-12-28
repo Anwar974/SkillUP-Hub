@@ -4,7 +4,7 @@ export const pagination = (page, limit) => {
     }
 
     if (!limit || limit <= 0) {
-        limit = 6;
+        limit = 10;
     }
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
