@@ -1,5 +1,7 @@
 import applicationModel from "../../../db/model/application.model.js";
 import programModel from "../../../db/model/program.model.js";
+import { sendEmail } from "../../ults/email.js";
+import { enrollmentStatusChangeEmailTemplate, statusChangeEmailTemplate } from "../../ults/emailTemplete.js";
 import { ApplicationsPagination } from "../../ults/pagination.js";
 
 export const postApplication = async (req, res) => {
@@ -163,7 +165,8 @@ export const updateApplicationStatus = async (req, res) => {
 
     const { programId, id } = req.params;
     const {status}  = req.body; 
-    const application = await applicationModel.findOneAndUpdate({ _id: id, programId }, { status }, { new: true });
+    const application = await applicationModel.findOneAndUpdate({ _id: id, programId }, { status }, { new: true })
+    .populate('programId', 'title');
     if (!application) {
         return res.status(404).json({ message: "Application not found" });
     }
@@ -181,29 +184,52 @@ export const updateApplicationStatus = async (req, res) => {
         await application.save();
     }
 
+    // await sendEmail(email, 'Password Reset Code',
+    //  sendCodeTemplate,  {userName:user.userName,code});
+
+    await sendEmail(
+        application.email, // Replace with the appropriate field for the user's email
+        `Your application for program has been
+         ${status}`,
+        statusChangeEmailTemplate,
+        { userName: application.englishName.split(" ")[0],
+         newStatus: status, programTitle: application.programId.title }
+    );
+
     return res.status(200).json({ message: "success", application });
 };
+
+
 export const updateEnrollmentStatus = async (req, res) => {
     const { id } = req.params;
-    const { enrollmentStatus } = req.body; 
-    const application = await applicationModel.findById(id);
+    const { enrollmentStatus } = req.body;
+
+    const application = await applicationModel.findById(id).populate('programId', 'title');
+    
     if (!application) {
         return res.status(404).json({ message: "Application not found" });
     }
 
     if (application.status === 'Pending') {
-        if (enrollmentStatus !== 'Off Track' || enrollmentStatus !== 'Enrolled') {
+        if (enrollmentStatus !== 'Off Track' && enrollmentStatus !== 'Enrolled') {
             return res.status(400).json({ message: `Student cannot be ${enrollmentStatus} when application is still pending` });
         }
     } else if (application.status === 'Rejected') {
         return res.status(400).json({ message: "Cannot change enrollment status when application is Rejected" });
-    } else if (application.status === 'Accepted') {
-        application.enrollmentStatus = enrollmentStatus;
-        await application.save();
-        return res.status(200).json({ message: "success", application });
     }
+
     application.enrollmentStatus = enrollmentStatus;
     await application.save();
+
+    // Send enrollment status change email
+    await sendEmail(
+        application.email, // Replace with the appropriate field for the user's email
+        `Enrollment Status Updated to ${enrollmentStatus}`,
+        enrollmentStatusChangeEmailTemplate,
+        { userName: application.englishName.split(" ")[0], newEnrollmentStatus: enrollmentStatus,
+            programTitle: application.programId.title 
+        }
+    );
 
     return res.status(200).json({ message: "success", application });
 };

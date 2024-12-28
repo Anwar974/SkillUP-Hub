@@ -76,7 +76,7 @@ export const sendCode = async(req,res) => {
         return res.status(404).json({message:" Unknown email address"});
     }
 
-    await sendEmail(email, 'Password Reset Code', sendCodeTemplate,  {userName:user.userName,code});
+    await sendEmail(email, 'Password Reset Code', sendCodeTemplate,  {userName:user.userName, code});
 
     return res.status(200).json({message:"success"});
 

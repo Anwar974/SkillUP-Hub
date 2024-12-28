@@ -191,3 +191,69 @@ export const sendCodeTemplate =( {userName,code}) => {
     </html>
     `;
 }
+
+export const statusChangeEmailTemplate = ({ userName, newStatus, programTitle }) => {
+
+    if(newStatus==='Accepted'){
+        return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px;
+     border: 1px solid #4640DE; border-radius: 8px;  color: #333;">
+        <h2 style="color: #4640DE;">Hello ${userName},</h2>
+        <p style="font-size: 16px;">We wanted to inform you that your application for the program <strong>"${programTitle}"</strong> has been <span style="color: #4CAF50; font-weight: bold;">${newStatus}</span>.</p>
+       <p style="font-size: 14px;">If you have any questions or need further assistance, contact with your instructor.</p>
+        <p style="font-size: 14px; margin-top: 20px;">Thank you,<br><strong>SkillUP HUB Admin</strong></p>
+         <img src="https://res.cloudinary.com/dh37z23kg/image/upload/v1735402002/Skill%20UP/images/4155938_ovrqar.jpg"
+          alt="Accepted status image" style="max-width: 100%; height: auto; border: 0;">
+        
+    </div>
+    `;
+    }else if(newStatus==='Rejected'){
+        return `
+
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px;
+        border: 1px solid #4640DE; border-radius: 8px; color: #333;">
+        <h2 style="color: #4640DE;">Hello ${userName},</h2>
+        <p style="font-size: 16px;">Thank you for applying to the <strong>${programTitle}</strong> program.
+        After careful consideration, we regret to inform you that your application was not successful at this time.</p>
+        <p style="font-size: 16px;">We encourage you to reapply in the future or explore resources to support your goals.</p>
+        <p style="font-size: 14px; margin-top: 20px;">Thank you,<br><strong>SkillUP HUB Admin</strong></p>
+        </div>
+        `;
+
+    }
+    
+};
+
+export const enrollmentStatusChangeEmailTemplate = ({ userName, newEnrollmentStatus, programTitle }) => {
+    let statusMessage;
+
+    // Customize message based on enrollment status
+    switch (newEnrollmentStatus) {
+        case 'Enrolled':
+            statusMessage = `Congratulations! You have been successfully <span color: #4640DE;">enrolled</span> in the "${programTitle}" program.`;
+            break;
+        case 'Passed':
+            statusMessage = `We are pleased to inform you that you have successfully 
+            <span color: #4CAF50;">passed</span> the requirements for the "${programTitle}" program.`;
+            break;
+        case 'Failed':
+            statusMessage = `Unfortunately, you did not meet the requirements for the "${programTitle}" program.
+             We encourage you to review the program guidelines and apply again in the future.`;
+            break;
+        case 'Off Track':
+            statusMessage = `Your progress in the "${programTitle}" program is currently off track. 
+            Please contact us to discuss next steps and explore ways to get back on course.`;
+            break;
+        default:
+            statusMessage = `Your enrollment status has been updated.`;
+    }
+
+    return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #4640DE; border-radius: 8px; color: #333;">
+        <h2 style="color: #4640DE;">Hello ${userName},</h2>
+        <p style="font-size: 16px;">${statusMessage}</p>
+        <p style="font-size: 16px;">If you have any questions or need further clarification, contact your instructor.</p>
+        <p style="font-size: 14px; margin-top: 20px;">Best regards,<br><strong>SkillUP HUB Team</strong></p>
+    </div>
+    `;
+};
