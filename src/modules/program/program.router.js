@@ -14,9 +14,14 @@ router.use('/:programId/application',applicationRouter);
 router.use('/:programId/review',reviewRouter);
 router.post('/', validation(schema.postTrainningProgramSchema), auth(endpoints.postTrainning), asyncHandler(controller.postProgram));
 router.get('/', asyncHandler(controller.getPrograms));
+// here we should change 
+router.get('/instructor-programs', asyncHandler(controller.getInstructorPrograms));
+
 router.get('/:id',auth(endpoints.get), asyncHandler(controller.getProgramById));
 router.patch('/:id/bookmark', auth(endpoints.bookmarkProgram), asyncHandler(controller.toggleBookmark));
 router.patch('/:id',validation(schema.updateProgramSchema), auth(endpoints.update), controller.updateProgram);
+
+//update the deleting program only to deactivate it
 router.delete('/:id', validation(schema.deleteProgramSchema),auth(endpoints.delete), controller.deleteProgram);
 
 export default router;

@@ -45,10 +45,23 @@ export const getUsers = async (req, res) => {
 
 export const getUserData = async (req, res) => {
     
-        const user = await userModel.findById(req.user._id); 
-        return res.status(200).json({ message: "success", user });
+    const user = await userModel.findById(req.user._id); 
+    return res.status(200).json({ message: "success", user });
     
 };
+
+export const getUserProfile = async (req, res) => {
+    const { userId } = req.params; // Fetch userId from the route parameter
+    const user = await userModel.findById(userId); // Find user by ID
+  
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+  
+    return res.status(200).json({ message: "success", user });
+  };
+
+
 export const changeUserStatus = async (req, res) => {
 
     const userId = req.params.id;

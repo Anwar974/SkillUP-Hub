@@ -88,6 +88,9 @@ const applicationSchema = new Schema({
         enum: ['Enrolled', 'Passed', 'Failed', 'Off Track'],
         default: 'Off Track'
     },
+
+    // add passport validation
+    //type of password
     
 },
 {

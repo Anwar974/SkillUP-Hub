@@ -6,12 +6,12 @@ export const postCompanySchema = Joi.object({
     description: Joi.string().optional(),
     locations: Joi.array().items(Joi.string().required()).min(1).required(),
     industry: Joi.string().required(),
-    companySize: Joi.string().required(),
-    foundedIn: Joi.string().required(),
+    companySize: Joi.string(),
+    foundedIn: Joi.string(),
 
     socialLinks: Joi.object({
         facebook: Joi.string().uri().allow('', null).optional(),
-        linkedIn: Joi.string().uri().allow('', null).required(),
+        linkedIn: Joi.string().uri().allow('', null).optional(),
         phoneNumber: Joi.string().allow('', null).optional(),
         email: Joi.string().email().required(),
     }).required(),

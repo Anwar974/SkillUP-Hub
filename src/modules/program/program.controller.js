@@ -6,6 +6,7 @@ import { pagination } from "../../ults/pagination.js";
 import companyModel from "../../../db/model/company.modal.js";
 import applicationModel from "../../../db/model/application.model.js";
 import reviewModel from "../../../db/model/review.model.js";
+import mongoose from 'mongoose';
 
 
 export const postProgram = async (req, res) => {
@@ -177,6 +178,31 @@ if (req.query.status) {
   }
 };
 
+//make sure this works very important 
+
+export const getInstructorPrograms = async (req, res, next) => {
+  try {
+
+    const userId = req.user._id; 
+
+    const userExists = await userModel.findById(userId);
+    if (!userExists) {
+        return res.status(404).json({ message: "User not found" });
+    }
+    
+    const queryObject = { userId: req.user._id };
+
+    const count = await programModel.countDocuments(queryObject);
+
+    const programs = await programModel.find(queryObject).populate("company").populate("categoryId") 
+      .select(req.query.fields); 
+
+    return res.status(200).json({ message: "success", count, programs, });
+  } catch (error) {
+    next(error);
+  }
+};
+
   export const getProgramById = async (req, res) => {
     try {
 
@@ -206,7 +232,6 @@ if (req.query.status) {
         res.status(500).json({ message: error.message });
     }
 };
-
 export const updateProgram = async (req, res) => {
     try {
 
@@ -245,7 +270,6 @@ export const updateProgram = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", error: err.message });
     }
 };
-
 export const toggleBookmark = async (req, res) => {
     try {
       const { id } = req.params;
@@ -275,7 +299,8 @@ export const toggleBookmark = async (req, res) => {
     }
   };
 
-  
+  //deactivate the program dont delete it 
+
 export const deleteProgram = async (req, res) => {
     const { id } = req.params;
     const program = await programModel.findById(id).populate('company', 'image');;

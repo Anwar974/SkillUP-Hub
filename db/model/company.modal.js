@@ -35,11 +35,11 @@ const companySchema = new Schema({
     },
     companySize:{
         type:String,
-        required:true,
+        required:false,
     },
     foundedIn:{
         type:String,
-        required:true,
+        required:false,
     },
     socialLinks: {
         facebook: {
