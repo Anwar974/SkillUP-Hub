@@ -4,6 +4,7 @@ import slugify from 'slugify';
 import cloudinary from "../../ults/cloudinary.js";
 import { pagination } from '../../ults/pagination.js';
 import programModel from '../../../db/model/program.model.js';
+import userModel from '../../../db/model/user.model.js';
 
 
 export const postCopmany = async (req, res) => {
@@ -135,6 +136,28 @@ export const getCompanyById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 
+}
+export const getInstructorCompanies = async (req, res,next) => {
+  try {
+    const userId = req.params.userId; 
+
+    const userExists = await userModel.findById(userId);
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const queryObject = { createdBy: userId };
+
+    const count = await companyModel.countDocuments(queryObject);
+
+    const companies = await companyModel
+      .find(queryObject)
+      .select(req.query.fields); 
+
+    return res.status(200).json({ message: "success", count, companies });
+  } catch (error) {
+    next(error); 
+
+}
 }
 
 export const updateCompany = async (req, res) => {

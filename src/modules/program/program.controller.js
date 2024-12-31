@@ -182,26 +182,33 @@ if (req.query.status) {
 
 export const getInstructorPrograms = async (req, res, next) => {
   try {
+    const userId = req.params.userId;
 
-    const userId = req.user._id; 
-
+    // Check if the user exists
     const userExists = await userModel.findById(userId);
     if (!userExists) {
-        return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
-    
-    const queryObject = { userId: req.user._id };
 
+    // Query to find programs created by the user
+    const queryObject = { createdBy: userId };
+
+    // Count the number of programs created by the user
     const count = await programModel.countDocuments(queryObject);
 
-    const programs = await programModel.find(queryObject).populate("company").populate("categoryId") 
-      .select(req.query.fields); 
+    // Fetch programs with the specified query
+    const programs = await programModel
+      .find(queryObject)
+      .populate("company")
+      .populate("categoryId")
+      .select(req.query.fields); // Select specific fields if provided in the query
 
-    return res.status(200).json({ message: "success", count, programs, });
+    return res.status(200).json({ message: "success", count, programs });
   } catch (error) {
-    next(error);
+    next(error); // Pass errors to the error-handling middleware
   }
 };
+
 
   export const getProgramById = async (req, res) => {
     try {
@@ -217,7 +224,11 @@ export const getInstructorPrograms = async (req, res, next) => {
             })
             .populate({
               path: 'company',  // Populate the company field
-          });
+          })
+          .populate({
+            path: 'createdBy',
+            select: 'userName image'
+        });
                         
         if (!program) {
             return res.status(404).json({ message: "Program not found" });
