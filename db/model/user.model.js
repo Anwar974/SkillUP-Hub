@@ -28,6 +28,8 @@ const userSchema = new Schema({
     gender:{
         type:String,
         enum:['Male','Female'],
+        required: false // Allow empty value
+
     },
     status:{
         type:String,
@@ -45,9 +47,13 @@ const userSchema = new Schema({
     },
     phone:{
         type:String,
+        required: false // Allow empty value
+
     },
     department:{
         type:String,
+        required: false // Allow empty value
+
     },
     socialLinks: {
         facebook: {

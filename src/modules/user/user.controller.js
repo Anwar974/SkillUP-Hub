@@ -99,7 +99,7 @@ export const editProfile = async (req, res) => {
             user.image = { secure_url, public_id };
         }
 
-        const { userName, email, password, phone, department, socialLinks } = req.body;
+        const { userName, email, password, phone, department,gender, socialLinks } = req.body;
 
         if (userName && userName !== user.userName) {
             if (await userModel.findOne({ userName })) {
@@ -110,12 +110,8 @@ export const editProfile = async (req, res) => {
 
         if (email && email !== user.email){
             user.email = email;
-            
-                const token = jwt.sign({email},process.env.CONFIRMSIGN)
-                
-                    const decoded = jwt.verify(token, process.env.CONFIRMSIGN);
-        
-
+            const token = jwt.sign({email},process.env.CONFIRMSIGN)
+            const decoded = jwt.verify(token, process.env.CONFIRMSIGN);
             await sendEmail(email, 'Welcome', welcomeEmailTemplate, { userName: user.userName, token });
             user.confirmEmail=false;
 
@@ -127,7 +123,7 @@ export const editProfile = async (req, res) => {
             );
             user.password = hashedPassword;
         }
-        if (phone & phone !== user.phone) user.phone = phone;
+        if (phone) user.phone = phone;
 
         // Update socialLinks only with provided fields
         if (socialLinks) {
@@ -146,6 +142,9 @@ export const editProfile = async (req, res) => {
                         : user.socialLinks.github,
             };
         }
+        if (gender) user.gender = gender;
+        if (department) user.department = department;
+
         await user.save();
 
         return res

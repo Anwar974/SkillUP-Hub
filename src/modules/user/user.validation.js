@@ -27,7 +27,9 @@ export const editProfileSchema = Joi.object({
         linkedIn: Joi.string().uri().allow('', null).optional(),
         github: Joi.string().uri().allow('', null).optional()
     }).optional(),
-
+    phone: Joi.string().optional(), // Make phone optional
+    gender: Joi.string().optional(), // Make gender optional
+    department: Joi.string().optional(), // Make department optional
     image:Joi.object({
         fieldname:Joi.string().required(),
         originalname:Joi.string().required(),
