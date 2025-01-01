@@ -3,11 +3,11 @@ import Joi from 'joi';
 // Simplified validation schema for posting a company
 export const postCompanySchema = Joi.object({
     companyName: Joi.string().min(4).max(30).required(),
-    description: Joi.string().optional(),
+    description: Joi.string().allow('', null).optional(),
     locations: Joi.array().items(Joi.string().required()).min(1).required(),
     industry: Joi.string().required(),
-    companySize: Joi.string(),
-    foundedIn: Joi.string(),
+    companySize: Joi.string().allow('', null).optional(),
+    foundedIn: Joi.string().allow('', null).optional(),
 
     socialLinks: Joi.object({
         facebook: Joi.string().uri().allow('', null).optional(),
@@ -32,11 +32,11 @@ export const postCompanySchema = Joi.object({
 export const updateCompanySchema = Joi.object({
     id:Joi.string().hex().length(24),
     companyName: Joi.string().min(4).max(30).optional(),
-    description: Joi.string().optional(),
+    description: Joi.string().allow('', null).optional(),
     locations: Joi.array().items(Joi.string().required()).min(1).optional(),
     industry: Joi.string().optional(),
-    companySize: Joi.string().optional(),
-    foundedIn: Joi.string().optional(),
+    companySize: Joi.string().allow('', null).optional(),
+    foundedIn: Joi.string().allow('', null).optional(),
 
     socialLinks: Joi.object({
         facebook: Joi.string().uri().allow('', null).optional(),

@@ -40,9 +40,6 @@ export const postCopmany = async (req, res) => {
         
 
         const company = await companyModel.create(req.body)
-
-        console.log("Request body:", req.body);
-        console.log("Uploaded file:", req.file);
         
         return res.status(200).json({message:"success",company});
 
@@ -218,12 +215,7 @@ export const updateCompany = async (req, res) => {
         company.locations = locations;
       }
 
-    for (let key in otherFields) {
-      if (otherFields[key] !== undefined) {
-        company[key] = otherFields[key];
-      }
-    }
-    
+      
     await company.save();
 
     res.status(200).json({ message: 'success', company });
