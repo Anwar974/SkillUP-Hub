@@ -13,8 +13,8 @@ export const postCompanySchema = Joi.object({
         facebook: Joi.string().uri().allow('', null).optional(),
         linkedIn: Joi.string().uri().allow('', null).optional(),
         phoneNumber: Joi.string().allow('', null).optional(),
-        email: Joi.string().email().required(),
-    }).required(),
+        email: Joi.string().email().allow('', null).optional(),
+    }),
 
     image:Joi.object({
     fieldname:Joi.string().required(),

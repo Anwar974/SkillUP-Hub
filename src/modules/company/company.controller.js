@@ -161,7 +161,7 @@ export const updateCompany = async (req, res) => {
 
     try{
 
-    const { companyName, locations, socialLinks, ...otherFields  } = req.body;
+    const { companyName, locations, socialLinks,industry,description,companySize,foundedIn } = req.body;
 
     const company = await companyModel.findById(req.params.id);
     if (!company) {
@@ -178,6 +178,10 @@ export const updateCompany = async (req, res) => {
         company.image = { secure_url, public_id };
     }
 
+
+    if(industry) {
+      company.industry = industry;
+    }
 
     if (companyName && companyName !== company.companyName) {
         if (await companyModel.findOne({ companyName })) {
@@ -215,7 +219,12 @@ export const updateCompany = async (req, res) => {
         company.locations = locations;
       }
 
-      
+      company.companySize = companySize !== undefined ? companySize : company.companySize;
+      company.foundedIn = foundedIn !== undefined ? foundedIn : company.foundedIn;
+      company.description = description !== undefined ? description : company.description;
+
+
+
     await company.save();
 
     res.status(200).json({ message: 'success', company });

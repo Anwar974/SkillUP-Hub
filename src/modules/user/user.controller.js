@@ -43,6 +43,20 @@ export const getUsers = async (req, res) => {
 }
 };
 
+export const getInstructors = async (req, res) => {
+    try{
+ // Find users with the role 'Instructor' and select specific fields
+ const instructors = await userModel.find({ role: 'Instructor' })
+ .select('userName email image department phone gender createdAt status role');
+
+ return res.status(200).json({ message: "successs", instructors });
+    }catch (err) {
+    return res
+        .status(500)
+        .json({ message: "Internal server error", error: err.message });
+}
+};
+
 export const getUserData = async (req, res) => {
     
     const user = await userModel.findById(req.user._id); 
@@ -59,24 +73,23 @@ export const getUserProfile = async (req, res) => {
     }
   
     return res.status(200).json({ message: "success", user });
-  };
-
+};
 
 export const changeUserStatus = async (req, res) => {
 
     const userId = req.params.id;
-    const { status } = req.body; // Expecting 'active' or 'inactive' in the request body
+    const { status } = req.body; 
     const updatedUser = await userModel.findByIdAndUpdate(
         userId,
         { status },
-        // { new: true }
+        { new: true }
     );
     if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
     }
     return res
         .status(200)
-        .json({ message: "User status updated successfully", user: updatedUser });
+        .json({ message: "success", user: updatedUser });
 };
 
 export const editProfile = async (req, res) => {
@@ -156,20 +169,19 @@ export const editProfile = async (req, res) => {
             .json({ message: "Internal server error", error: err.message });
     }
 };
-
-export const deleteUser = async (req, res) => {
+// instructor/student deactivate his own account
+export const deactivateAccount = async (req, res) => {
     try {
-        // Find the user by ID
-        const user = await userModel.findById(req.params.id);
+
+        const user = await userModel.findById(req.user._id);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Update the user's status to "NotActive" instead of deleting
         user.status = "NotActive";
         await user.save();
         
-        return res.status(200).json({ message: "User status updated to NotActive successfully" });
+        return res.status(200).json({ message: "success" });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Internal server error", error: error.message });
@@ -183,6 +195,6 @@ export const getBookmarkedPrograms = async (req, res) => {
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
-  };
+};
   
   

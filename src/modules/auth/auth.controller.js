@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { sendEmail } from "../../ults/email.js";
 import { customAlphabet } from "nanoid";
-import { sendCodeTemplate, welcomeEmailTemplate } from "../../ults/emailTemplete.js";
+import { reactivationEmailTemplate, sendCodeTemplate, welcomeEmailTemplate } from "../../ults/emailTemplete.js";
 
 export const register = async (req, res)=>{
     
@@ -34,8 +34,32 @@ export const confirmEmail = async (req, res)=>{
     return res.redirect(`http://localhost:5173/email-confirmation?status=error`);
 
 }
-
 }
+
+export const reactivateAccount = async (req, res) => {
+    const token = req.params.token;
+  
+    try {
+      const decoded = jwt.verify(token, process.env.REACTIVATION_SIG);
+      const user = await userModel.findById(decoded.id);
+  
+      if (!user) {
+        return res.status(400).json({ message: "Invalid or expired token" });
+      }
+  
+      user.status = "Active";
+      await user.save();
+      res.status(200).json({ message: "success" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Error reactivating account", error: err.message });
+    }
+  };
+
+//     return res.redirect(`https://skillup-front.onrender.com/email-confirmation?status=success`);
+ 
+//     return res.redirect(`https://skillup-front.onrender.com/email-confirmation?status=error`);
+
 
 export const login = async(req, res)=>{
     const {email, password} = req.body;
@@ -47,15 +71,21 @@ export const login = async(req, res)=>{
     }
 
     if (!user.confirmEmail){
-        return res.status(400).json({message:"plz confirm your email"});
+        return res.status(400).json({message:"please confirm your email"});
     }
+
+    
 
     const match = await bcrypt.compare(password, user.password);
-    if(user.status=="NotActive"){
-        return res.status(400).json({message: "your account is blocked"});
-
-
-    }
+    if (user.status === "NotActive") {
+        const token = jwt.sign({ id: user._id }, process.env.REACTIVATION_SIG, { expiresIn: '1h' });
+        const userName =user.userName;
+        await sendEmail(email, "Account Reactivation", reactivationEmailTemplate, { userName, token });
+  
+        return res.status(400).json({
+          message: "Your account is deactivated. A reactivation email has been sent to you."
+        });
+      }
     if(!match) {
     return res.status(400).json({message: "invalid data"});
     }

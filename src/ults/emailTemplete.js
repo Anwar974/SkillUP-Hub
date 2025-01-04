@@ -257,3 +257,58 @@ export const enrollmentStatusChangeEmailTemplate = ({ userName, newEnrollmentSta
     </div>
     `;
 };
+
+export const reactivationEmailTemplate = ({ userName, token }) => {
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head>    
+        <style>
+        body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #f7f7f7;
+                margin: 0;
+                padding: 0;
+                color: #333;
+            }
+            .container {
+                width: 100%;
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                box-sizing: border-box;
+            }
+        .button {
+                display: inline-block;
+                padding: 12px 24px;
+                font-size: 16px;
+                font-weight: 600;
+                color: #ffffff !important;
+                background-color: #4640DE; 
+                border-radius: 5px;
+                text-decoration: none;
+                margin: 10px 0;
+                transition: background-color 0.3s ease;
+            }
+            .button:hover {
+                background-color: #218838; /* Darker shade on hover */
+            }
+        </style>
+    </head>
+    <body>
+    <div class="container" >
+
+     <h1>Hello ${userName},</h1>
+      <p>It looks like your account is currently deactivated. To reactivate your account, please click the link below:</p>
+      <a href='http://localhost:3000/auth/reactivate/${token}' class='button'>Reactivate My Account</a>
+      <p>If you did not request this, please ignore this email.</p>
+      <p>Thank you!</p>
+
+    </div>
+     
+    </body>
+    `;
+  };

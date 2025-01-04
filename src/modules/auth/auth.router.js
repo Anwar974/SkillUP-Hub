@@ -13,6 +13,8 @@ router.post('/login', validation(schema.loginSchema),controller.login);
 router.patch('/sendcode',validation(schema.sendCodeSchema), controller.sendCode);
 router.patch('/forgotpassword',validation(schema.forgotPasswordSchema), controller.forgotPassword);
 router.get('/confirmEmail/:token',controller.confirmEmail);
+router.get('/reactivate/:token',controller.reactivateAccount);
+
 
 
 
