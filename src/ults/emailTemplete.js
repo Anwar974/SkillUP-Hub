@@ -197,13 +197,13 @@ export const statusChangeEmailTemplate = ({ userName, newStatus, programTitle })
     if(newStatus==='Accepted'){
         return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px;
-     border: 1px solid #4640DE; border-radius: 8px;  color: #333;">
+      border-radius: 8px;  color: #333;">
         <h2 style="color: #4640DE;">Hello ${userName},</h2>
         <p style="font-size: 16px;">We wanted to inform you that your application for the program <strong>"${programTitle}"</strong> has been <span style="color: #4CAF50; font-weight: bold;">${newStatus}</span>.</p>
        <p style="font-size: 14px;">If you have any questions or need further assistance, contact with your instructor.</p>
         <p style="font-size: 14px; margin-top: 20px;">Thank you,<br><strong>SkillUP HUB Admin</strong></p>
          <img src="https://res.cloudinary.com/dh37z23kg/image/upload/v1735402002/Skill%20UP/images/4155938_ovrqar.jpg"
-          alt="Accepted status image" style="max-width: 100%; height: auto; border: 0;">
+          alt="Accepted status image" style="max-width: 500px; height: auto; border: 0;">
         
     </div>
     `;

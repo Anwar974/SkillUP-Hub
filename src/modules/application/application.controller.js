@@ -172,22 +172,21 @@ export const updateApplicationStatus = async (req, res) => {
         return res.status(404).json({ message: "Application not found" });
     }
 
-     // Prevent changing from Accepted to Pending if enrollmentStatus is not Off Track
-     if (application.status === 'Accepted' && status === 'Pending' && application.enrollmentStatus !== 'Off Track') {
-        return res.status(400).json({ message: "Cannot change status from Accepted to Pending when enrollment status is not Off Track" });
+     if (application.status === 'Accepted') {
+        return res.status(400).json({ message: "You cannot change Accpeted status." });
     }
 
-    // Update the status as requested
     application.status = status;
     
     if (status === 'Accepted') {
         application.enrollmentStatus = 'Enrolled';
         await application.save();
+    }else{
+        application.enrollmentStatus = 'Off Track';
+        await application.save();
     }
 
-    // await sendEmail(email, 'Password Reset Code',
-    //  sendCodeTemplate,  {userName:user.userName,code});
-
+    if(application.status==='Accepted' || 'Rejected') {
     await sendEmail(
         application.email, // Replace with the appropriate field for the user's email
         `Your application for program has been
@@ -195,7 +194,7 @@ export const updateApplicationStatus = async (req, res) => {
         statusChangeEmailTemplate,
         { userName: application.englishName.split(" ")[0],
          newStatus: status, programTitle: application.programId.title }
-    );
+    );}
 
     return res.status(200).json({ message: "success", application });
 };
@@ -211,16 +210,16 @@ export const updateEnrollmentStatus = async (req, res) => {
         return res.status(404).json({ message: "Application not found" });
     }
 
-    if (application.status === 'Pending') {
-        if (enrollmentStatus !== 'Off Track' && enrollmentStatus !== 'Enrolled') {
-            return res.status(400).json({ message: `Student cannot be ${enrollmentStatus} when application is still pending` });
+    if (application.status === 'Pending' || application.status === 'Rejected') {
+        if (enrollmentStatus !== 'Off Track') {
+            return res.status(400).json({ message: `Student cannot be ${enrollmentStatus} when application is ${application.status}`});
         }
-    } else if (application.status === 'Rejected') {
-        return res.status(400).json({ message: "Cannot change enrollment status when application is Rejected" });
+    }else{
+       application.enrollmentStatus = enrollmentStatus;
+    await application.save(); 
     }
 
-    application.enrollmentStatus = enrollmentStatus;
-    await application.save();
+    
 
     // Send enrollment status change email
     await sendEmail(
