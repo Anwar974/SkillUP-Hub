@@ -50,15 +50,16 @@ export const reactivateAccount = async (req, res) => {
       user.status = "Active";
       await user.save();
       res.status(200).json({ message: "success" });
+
+      return res.redirect(`http://localhost:5173/reactivate-account`);
+
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Error reactivating account", error: err.message });
     }
   };
 
-//     return res.redirect(`https://skillup-front.onrender.com/email-confirmation?status=success`);
- 
-//     return res.redirect(`https://skillup-front.onrender.com/email-confirmation?status=error`);
+//  return res.redirect(`https://skillup-front.onrender.com/email-confirmation?status=error`);
 
 
 export const login = async(req, res)=>{
