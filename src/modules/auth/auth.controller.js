@@ -51,7 +51,7 @@ export const reactivateAccount = async (req, res) => {
       await user.save();
     //   res.status(200).json({ message: "success" });
 
-      return res.redirect(`http://localhost:5173/reactivate-account`);
+      return res.redirect(` http://localhost:5173/reactivate-account`);
 
     } catch (err) {
       console.error(err);

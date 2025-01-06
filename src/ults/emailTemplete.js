@@ -87,7 +87,7 @@ export const welcomeEmailTemplate = ({ userName, token }) => {
                 <img src="https://res.cloudinary.com/dh37z23kg/image/upload/v1721811232/Skill%20UP/images/20944101_tyfa7b.jpg" alt="Welcome Image" style="max-width: 100%; height: auto; border: 0;">
 
 <p>We’re excited to have you with us. Confirm your email by clicking the button below:</p>
-                <a href='http://localhost:3000/auth/confirmEmail/${token}' class='button'>Confirm Email</a>
+                <a href='https://graduation-project-umber.vercel.app/auth/confirmEmail/${token} || https://localhost:3000/auth/confirmEmail/${token}' class='button'>Confirm Email</a>
             </div>
             <div class="footer">
                 &copy; ${new Date().getFullYear()} Our Service. All rights reserved. <br>
@@ -303,7 +303,7 @@ export const reactivationEmailTemplate = ({ userName, token }) => {
 
      <h1>Hello ${userName},</h1>
       <p>It looks like your account is currently deactivated. To reactivate your account, please click the link below:</p>
-      <a href='http://localhost:3000/auth/reactivate/${token}' class='button'>Reactivate My Account</a>
+      <a href='https://graduation-project-umber.vercel.app/auth/reactivate/${token}|| http://localhost:3000/auth/reactivate/${token}' class='button'>Reactivate My Account</a>
       <p>If you did not request this, please ignore this email.</p>
       <p>Thank you!</p>
 
