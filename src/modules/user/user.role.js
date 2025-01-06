@@ -7,5 +7,6 @@ export const endpoints ={
     editProfile : [roles.Instructor],
     getUsers: [roles.Admin],
     getBookmarks: [roles.User],
+    myApplications: [roles.User],
     userData:[roles.Admin, roles.Instructor, roles.User],
 }

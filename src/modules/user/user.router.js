@@ -15,6 +15,7 @@ router.get('/all-instructors',auth(endpoints.getUsers), asyncHandler(controller.
 router.get('/profile/:userId',  asyncHandler(controller.getUserProfile));
 router.get('/profile',auth(endpoints.userData),  asyncHandler(controller.getUserData));
 router.get('/bookmarks', auth(endpoints.getBookmarks), asyncHandler(controller.getBookmarkedPrograms));
+router.get('/my-applications', auth(endpoints.myApplications), controller.getMyApplications);
 router.post('/create-user',auth(endpoints.createUser),validation(schema.createUserSchema),checkEmail,asyncHandler(controller.createUser) );
 router.patch('/:id',validation(schema.changeStatusSchema),auth(endpoints.changeUserStatus),asyncHandler(controller.changeUserStatus));
 router.patch('/edit-profile/:id',fileUpload(fileType.image).single('image'), validation(schema.editProfileSchema),

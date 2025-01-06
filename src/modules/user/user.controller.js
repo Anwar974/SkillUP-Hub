@@ -5,6 +5,7 @@ import { welcomeEmailTemplate } from "../../ults/emailTemplete.js";
 import { sendEmail } from "../../ults/email.js";
 import cloudinary from "../../ults/cloudinary.js";
 import { confirmEmail } from "../auth/auth.controller.js";
+import applicationModel from "../../../db/model/application.model.js";
 
 export const createUser = async (req, res) => {
 
@@ -197,4 +198,17 @@ export const getBookmarkedPrograms = async (req, res) => {
     }
 };
   
+export const getMyApplications = async (req, res) => {
+    try { 
+        
+        const applications = await applicationModel.find({userId:req.user._id })
+        .select("arabicName englishName email appliedAt status enrollmentStatus")
+        .populate('programId','title');
+
+        return res.status(200).json({ applications });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+};
   
