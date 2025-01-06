@@ -16,6 +16,9 @@ import Joi from 'joi';
     hoursPassed: Joi.number().required(),
     year: Joi.string().valid('سنة أولى', 'سنة ثانية', 'سنة ثالثة', 'سنة رابعة', 'سنة خامسة').required(),
     fieldTrainingsPassed: Joi.string().valid('تدريب ميداني 1', 'تدريب ميداني 2', 'كليهما', 'لا شيئ مما ذكر').required(),
+    branch: Joi.string().valid('طولكرم','رام الله','العروب').required(),
+    passportInfo: Joi.string().valid('جواز فلسطيني','جواز أردني','جواز سفر آخر','لا املك جواز سفر').required(),
+
     notes: Joi.string().optional()
 
 });
@@ -36,6 +39,8 @@ export const updateApplicationSchema = Joi.object({
     hoursPassed: Joi.number().optional(),
     year: Joi.string().valid('سنة أولى', 'سنة ثانية', 'سنة ثالثة', 'سنة رابعة', 'سنة خامسة').optional(),
     fieldTrainingsPassed: Joi.string().valid('تدريب ميداني 1', 'تدريب ميداني 2', 'كليهما', 'لا شيئ مما ذكر').optional(),
+    branch: Joi.string().valid('طولكرم','رام الله','العروب').optional(),
+    passportInfo: Joi.string().valid('جواز فلسطيني','جواز أردني','جواز سفر آخر','لا املك جواز سفر').optional(),
     notes: Joi.string().optional(),
 });
 

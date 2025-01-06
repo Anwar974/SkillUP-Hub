@@ -50,12 +50,8 @@ export const reactivateAccount = async (req, res) => {
       user.status = "Active";
       await user.save();
 
-      // if(res.status === 200){
         return res.redirect(`http://localhost:5173/reactivate-account`);
-      // }
-      // res.status(200).json({ message: "success" });
-
-      // 
+      
 
     } catch (err) {
       console.error(err);
@@ -71,12 +67,12 @@ export const login = async(req, res)=>{
     const user = await userModel.findOne({email});
 
     if(!user) {
-        return res.status (400).json({message: " Unknown email address"});
+        return res.status (400).json({message: "Email not found"});
 
     }
 
     if (!user.confirmEmail){
-        return res.status(400).json({message:"please confirm your email"});
+        return res.status(400).json({message:"Please Verify your email."});
     }
 
     
@@ -92,7 +88,7 @@ export const login = async(req, res)=>{
         });
       }
     if(!match) {
-    return res.status(400).json({message: "invalid data"});
+    return res.status(400).json({message: "Invalid email or password."});
     }
     
 
@@ -108,7 +104,7 @@ export const sendCode = async(req,res) => {
     const user = await userModel.findOneAndUpdate({email},{sendCode:code}, {new:true});
 
     if (!user){
-        return res.status(404).json({message:" Unknown email address"});
+        return res.status(404).json({message:"Email not found"});
     }
 
     await sendEmail(email, 'Password Reset Code', sendCodeTemplate,  {userName:user.userName, code});
@@ -122,7 +118,7 @@ export const forgotPassword = async(req,res) => {
     const user = await userModel.findOne({email});
 
     if (!user){
-        return res.status(404).json({message:"email not found"});
+        return res.status(404).json({message:"Email not found"});
     }
     if (user.sendCode!= code){
         return res.status(400).json({message:"invalid code"});

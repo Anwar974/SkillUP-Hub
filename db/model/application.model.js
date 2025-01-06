@@ -77,11 +77,22 @@ const applicationSchema = new Schema({
     },
     fieldTrainingsPassed: {
         type: String, 
-        enum:['تدريب ميداني 1','تدريب ميداني 2','كليهما','لا شيئ مما ذكر'],
+        enum:['تدريب ميداني 1','تدريب ميداني 2','كليهما','غير ذلك'],
+        required: true
+    },
+    branch: {
+        type: String, 
+        enum:['طولكرم','رام الله','العروب'],
+        required: true
+    },
+    passportInfo: {
+        type: String, 
+        enum:['جواز فلسطيني','جواز أردني','جواز سفر آخر','لا املك جواز سفر'],
         required: true
     },
     notes: {
-        type: String
+        type: String,
+        required:false,
     },
     enrollmentStatus: {
         type: String,

@@ -6,9 +6,10 @@ import { ApplicationsPagination } from "../../ults/pagination.js";
 
 export const postApplication = async (req, res) => {
     try {
+
         const { programId } = req.params;
         const { arabicName, englishName, email, phone, studentId, major, gradeEnglish1, gradeEnglish2, gba,
-            hoursPassed, year, fieldTrainingsPassed, notes } = req.body;
+            hoursPassed, year, fieldTrainingsPassed,branch,passportInfo, notes } = req.body;
 
         const program = await programModel.findById(programId);
         if (!program) {
@@ -42,6 +43,8 @@ export const postApplication = async (req, res) => {
             hoursPassed,
             year,
             fieldTrainingsPassed,
+            branch,
+            passportInfo,
             notes,
             userId: req.user._id, // Assuming the user ID is obtained from the auth middleware
             programId,
@@ -51,14 +54,12 @@ export const postApplication = async (req, res) => {
         await newApplication.save();
 
         const totalApplications = await applicationModel.countDocuments();
-    const totalPages = Math.ceil(totalApplications / limit);
 
 
         return res.status(201).json({
             message: "Application created successfully",
             application: newApplication,
             totalApplications,
-            totalPages
         });
     } catch (error) {
         console.error(error);
