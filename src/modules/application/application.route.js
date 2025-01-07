@@ -5,10 +5,9 @@ import { endpoints } from './application.role.js'; // Adjust according to your a
 import { validation } from '../../middleware/validation.js';
 import * as schema from './application.validation.js';
 import { asyncHandler } from '../../ults/catchError.js';
-
 const router = Router({mergeParams:true});
 
-router.post('/', validation(schema.postApplicationSchema), auth(endpoints.post), asyncHandler(controller.postApplication));
+router.post('/',asyncHandler(controller.addProgramType),validation(schema.postApplicationSchema), auth(endpoints.post), asyncHandler(controller.postApplication));
 router.get('/', asyncHandler(controller.getApplicationsByProgram));
 router.get('/user-application', auth(endpoints.myApplication), controller.getApplicationById);
 router.patch('/:id', validation(schema.updateApplicationSchema), auth(endpoints.update), asyncHandler(controller.updateApplication));

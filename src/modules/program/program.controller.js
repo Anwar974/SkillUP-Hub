@@ -12,7 +12,8 @@ import mongoose from 'mongoose';
 export const postProgram = async (req, res) => {
 
     try{
-        const { title, description, company, location, mode, startDate, endDate,hasApplicationForm, categoryId } = req.body;
+      // majors
+        const { title, description, company, location, mode, type, startDate, endDate,hasApplicationForm, categoryId } = req.body;
         const userId = req.user._id; 
 
         const userExists = await userModel.findById(userId);
@@ -30,7 +31,6 @@ export const postProgram = async (req, res) => {
             return res.status(404).json({ message: "Company not found" });
         }
 
-        // Check for duplicate programs with the same title, startDate, endDate, and userId
         const existingProgram = await programModel.findOne({
             title,
             startDate,
@@ -51,6 +51,7 @@ export const postProgram = async (req, res) => {
             company,
             location : location || undefined,
             mode,
+            type,
             startDate,
             endDate,
             hasApplicationForm: hasApplicationForm ?? false,
@@ -108,11 +109,13 @@ export const getPrograms = async (req, res, next) => {
       }
     }
 
-
-
     // Handling modes filter
     if (req.query.modes) {
       queryObject.mode = { $in: req.query.modes.split(",") };
+    }
+    // Handling types filter
+    if (req.query.types) {
+      queryObject.type = { $in: req.query.types.split(",") };
     }
     
     // Status filter: past, active, or all
@@ -245,7 +248,7 @@ export const getInstructorPrograms = async (req, res, next) => {
 };
 export const updateProgram = async (req, res) => {
     try {
-
+// majors,
         const { title, description, company, location, mode, startDate, endDate, hasApplicationForm, categoryId } = req.body;
         const program = await programModel.findById(req.params.id);
 
@@ -264,6 +267,8 @@ export const updateProgram = async (req, res) => {
         if (title) program.title = title;
         if (description) program.description = description;
         if (location) program.location = location;
+        // if (majors) program.majors = majors;
+
         if (mode) program.mode = mode;
         if (startDate) program.startDate = new Date(startDate);
         if (endDate) program.endDate = new Date(endDate);

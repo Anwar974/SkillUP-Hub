@@ -1,25 +1,51 @@
 import applicationModel from "../../../db/model/application.model.js";
+// import InternationalApplication from "../../../db/model/international.application.model.js";
+// import LocalApplication from "../../../db/model/local.application.model.js";
 import programModel from "../../../db/model/program.model.js";
 import { sendEmail } from "../../ults/email.js";
 import { enrollmentStatusChangeEmailTemplate, statusChangeEmailTemplate } from "../../ults/emailTemplete.js";
 import { ApplicationsPagination } from "../../ults/pagination.js";
 
-export const postApplication = async (req, res) => {
+
+export const addProgramType = async (req, res, next) => {
     try {
-
         const { programId } = req.params;
-        const { arabicName, englishName, email, phone, studentId, major, gradeEnglish1, gradeEnglish2, gba,
-            hoursPassed, year, fieldTrainingsPassed,branch,passportInfo, notes } = req.body;
-
         const program = await programModel.findById(programId);
+
         if (!program) {
             return res.status(404).json({ message: "Program not found" });
         }
 
-        // Check if the program accepts applications through the platform
+        req.body.programType = program.type; // Add programType to the request body
+        next(); // Pass control to the next middleware
+    } catch (error) {
+        next(error); // Handle errors properly
+    }
+};
+
+export const postApplication = async (req, res) => {
+    try {
+
+        const { programId } = req.params;
+        const { arabicName, englishName, email, phone, studentId, gender, gradeEnglish1, gradeEnglish2, gba,
+        hoursPassed, year, fieldTrainingsPassed,branch, notes,  } = req.body;
+
+// visa,localId
+
+        const program = await programModel.findById(programId);
+
+        if (!program) {
+            return res.status(404).json({ message: "Program not found" });
+        }
+
         if (!program.hasApplicationForm) {
             return res.status(400).json({ message: "This program does not accept applications through the platform" });
         }
+
+        const programType = program.type;
+        req.body.programType = programType;
+
+
     
         const existingApplication = await applicationModel.findOne({ userId:req.user._id, programId });
         
@@ -27,16 +53,14 @@ export const postApplication = async (req, res) => {
             return res.status(400).json({ message: "You have already applied for this program" });
         }
 
-
-
         // Create the application
-        const newApplication = new applicationModel({
+        const applicationData ={
             arabicName,
             englishName,
             studentId,
             email,
             phone,
-            major,
+            gender,
             gradeEnglish1,
             gradeEnglish2,
             gba,
@@ -44,17 +68,31 @@ export const postApplication = async (req, res) => {
             year,
             fieldTrainingsPassed,
             branch,
-            passportInfo,
             notes,
             userId: req.user._id, // Assuming the user ID is obtained from the auth middleware
             programId,
+            programType,
             appliedAt: new Date(),
-        });
+        };
+
+        let newApplication;
+
+        // if (programType === 'international') {
+        //     applicationData.passportInfo = passportInfo;
+        //     applicationData.visa = visa;
+        //     newApplication = new InternationalApplication(applicationData);
+            
+
+        // } else if (programType === 'local'){
+        //     applicationData.localId = localId;
+        //     newApplication = new LocalApplication(applicationData);
+        // }
+
+        newApplication = new applicationModel(applicationData);
 
         await newApplication.save();
 
         const totalApplications = await applicationModel.countDocuments();
-
 
         return res.status(201).json({
             message: "Application created successfully",

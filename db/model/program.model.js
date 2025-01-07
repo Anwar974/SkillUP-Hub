@@ -24,6 +24,12 @@ const programSchema = new Schema({
         type:String,
         required:false,
     },
+    // majors:[
+    //     {
+    //     type:String,
+    //     required:true,
+    //     }
+    // ],
     mode:{
         type:String,
         default:'offline',
@@ -37,16 +43,15 @@ const programSchema = new Schema({
         type:Date,
         required:true,
     },
+    type: {
+        type: String,
+        required: true,
+        enum: ['local', 'international','online'],
+    },
     hasApplicationForm: {
         type: Boolean,
         default: true,
     },
-    // status:{
-    //     type:String,
-    //     default:'Active',
-    //     enum:['Active','NotActive'],
-
-    // },
     userId:{
         type:Types.ObjectId,
         ref:'User',

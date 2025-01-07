@@ -2,13 +2,7 @@ import mongoose, { Schema, Types, model } from "mongoose";
 import reviewModel from "./review.model.js";
 
 const applicationSchema = new Schema({
-
-    status:{
-        type:String,
-        default:'Pending',
-        enum:['Pending','Rejected','Accepted'],
-
-    },
+    
     userId:{
         type:Types.ObjectId,
         ref:'User',
@@ -48,6 +42,11 @@ const applicationSchema = new Schema({
         type: String,
         required: true
     },
+    gender:{
+        type:String,
+        enum:['Male','Female'],
+        required: true
+    },
     gradeEnglish1: {
         type: Number,
         required: true,
@@ -85,11 +84,6 @@ const applicationSchema = new Schema({
         enum:['طولكرم','رام الله','العروب'],
         required: true
     },
-    passportInfo: {
-        type: String, 
-        enum:['جواز فلسطيني','جواز أردني','جواز سفر آخر','لا املك جواز سفر'],
-        required: true
-    },
     notes: {
         type: String,
         required:false,
@@ -99,13 +93,20 @@ const applicationSchema = new Schema({
         enum: ['Enrolled', 'Passed', 'Failed', 'Off Track'],
         default: 'Off Track'
     },
+    status:{
+        type:String,
+        default:'Pending',
+        enum:['Pending','Rejected','Accepted'],
 
-    // add passport validation
-    //type of password
-    
+    },
+    programType: {
+        type: String,
+        required: true
+    },
 },
 {
     timestamps:true,
+    // discriminatorKey: 'applicationType',
 });
 
 

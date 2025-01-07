@@ -8,6 +8,9 @@ import Joi from 'joi';
    company: Joi.string().required(),
    location: Joi.string().optional(),
    mode: Joi.string().valid('online', 'offline', 'hybrid').default('offline'),
+   type: Joi.string().valid('local', 'international','online').required(),
+  
+  //  majors: Joi.array().items(Joi.string().optional()).min(1).optional(),
    startDate: Joi.date().required(),
    endDate: Joi.date().required(),
    hasApplicationForm: Joi.boolean().default(false),
@@ -21,6 +24,7 @@ import Joi from 'joi';
    description: Joi.string().optional(),
    company: Joi.string().optional(),
    location: Joi.string().optional(),
+  //  majors: Joi.string().optional(),
    mode: Joi.string().valid('online', 'offline', 'hybrid').optional(),
    startDate: Joi.date().optional(), 
    endDate: Joi.date().optional(),

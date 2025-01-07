@@ -9,7 +9,7 @@ import Joi from 'joi';
     email:Joi.string().email().required(),
     phone: Joi.string().required(),
     studentId: Joi.string().length(9).required(),
-    major: Joi.string().required(),
+    gender: Joi.string().required(),
     gradeEnglish1: Joi.number().min(0).max(100).required(),
     gradeEnglish2: Joi.number().min(0).max(100).required(),
     gba: Joi.number().min(0).max(100).required(),
@@ -17,10 +17,25 @@ import Joi from 'joi';
     year: Joi.string().valid('سنة أولى', 'سنة ثانية', 'سنة ثالثة', 'سنة رابعة', 'سنة خامسة').required(),
     fieldTrainingsPassed: Joi.string().valid('تدريب ميداني 1', 'تدريب ميداني 2', 'كليهما', 'لا شيئ مما ذكر').required(),
     branch: Joi.string().valid('طولكرم','رام الله','العروب').required(),
-    passportInfo: Joi.string().valid('جواز فلسطيني','جواز أردني','جواز سفر آخر','لا املك جواز سفر').required(),
+    arabicName: Joi.string().required(),
+    notes: Joi.string().optional(),
 
-    notes: Joi.string().optional()
-
+    // passportInfo: Joi.when('programType', {
+    //     is: 'international',
+    //     then: Joi.string().valid('جواز فلسطيني', 'جواز أردني', 'جواز سفر آخر', 'لا املك جواز سفر').required(),
+    //     otherwise: Joi.forbidden(), 
+    // }),
+    // visa: Joi.when('programType', {
+    //     is: 'international',
+    //     then: Joi.string().required(),
+    //     otherwise: Joi.forbidden(),
+    // }),
+    // localId: Joi.when('programType', {
+    //     is: 'local',
+    //     then: Joi.string().required(),
+    //     otherwise: Joi.forbidden(),
+    // }),
+    
 });
 
 
@@ -32,7 +47,7 @@ export const updateApplicationSchema = Joi.object({
     studentId: Joi.string().optional(),
     email:Joi.string().email().optional(),
     phone: Joi.string().optional(),
-    major: Joi.string().optional(),
+    gender: Joi.string().optional(),
     gradeEnglish1: Joi.number().min(0).max(100).optional(),
     gradeEnglish2: Joi.number().min(0).max(100).optional(),
     gba: Joi.number().min(0).max(100).optional(),
@@ -40,8 +55,8 @@ export const updateApplicationSchema = Joi.object({
     year: Joi.string().valid('سنة أولى', 'سنة ثانية', 'سنة ثالثة', 'سنة رابعة', 'سنة خامسة').optional(),
     fieldTrainingsPassed: Joi.string().valid('تدريب ميداني 1', 'تدريب ميداني 2', 'كليهما', 'لا شيئ مما ذكر').optional(),
     branch: Joi.string().valid('طولكرم','رام الله','العروب').optional(),
-    passportInfo: Joi.string().valid('جواز فلسطيني','جواز أردني','جواز سفر آخر','لا املك جواز سفر').optional(),
     notes: Joi.string().optional(),
+
 });
 
 export const updateApplicationStatusSchema = Joi.object({
