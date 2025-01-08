@@ -17,7 +17,8 @@ import Joi from 'joi';
     year: Joi.string().valid('سنة أولى', 'سنة ثانية', 'سنة ثالثة', 'سنة رابعة', 'سنة خامسة').required(),
     fieldTrainingsPassed: Joi.string().valid('تدريب ميداني 1', 'تدريب ميداني 2', 'كليهما', 'لا شيئ مما ذكر').required(),
     branch: Joi.string().valid('طولكرم','رام الله','العروب').required(),
-    arabicName: Joi.string().required(),
+    programType: Joi.string().required(),
+    major: Joi.string().required(),
     notes: Joi.string().optional(),
 
     // passportInfo: Joi.when('programType', {
@@ -56,6 +57,8 @@ export const updateApplicationSchema = Joi.object({
     fieldTrainingsPassed: Joi.string().valid('تدريب ميداني 1', 'تدريب ميداني 2', 'كليهما', 'لا شيئ مما ذكر').optional(),
     branch: Joi.string().valid('طولكرم','رام الله','العروب').optional(),
     notes: Joi.string().optional(),
+    programType: Joi.string().optional(),
+    major: Joi.string().optional(),
 
 });
 

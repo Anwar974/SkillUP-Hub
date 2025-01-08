@@ -24,16 +24,22 @@ const programSchema = new Schema({
         type:String,
         required:false,
     },
-    // majors:[
-    //     {
-    //     type:String,
-    //     required:true,
-    //     }
-    // ],
+    majors:[
+        {
+        type:String,
+        }
+    ],
     mode:{
         type:String,
         default:'offline',
         enum:['online','offline','hybrid'],
+
+    },
+    type: {
+        type: String,
+        enum: ['local', 'international'],
+        required: true,
+
     },
     startDate:{
         type:Date,
@@ -42,11 +48,6 @@ const programSchema = new Schema({
     endDate:{
         type:Date,
         required:true,
-    },
-    type: {
-        type: String,
-        required: true,
-        enum: ['local', 'international','online'],
     },
     hasApplicationForm: {
         type: Boolean,

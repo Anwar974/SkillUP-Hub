@@ -28,7 +28,7 @@ export const postApplication = async (req, res) => {
 
         const { programId } = req.params;
         const { arabicName, englishName, email, phone, studentId, gender, gradeEnglish1, gradeEnglish2, gba,
-        hoursPassed, year, fieldTrainingsPassed,branch, notes,  } = req.body;
+        hoursPassed, year, fieldTrainingsPassed,branch, notes, major } = req.body;
 
 // visa,localId
 
@@ -69,6 +69,7 @@ export const postApplication = async (req, res) => {
             fieldTrainingsPassed,
             branch,
             notes,
+            major,
             userId: req.user._id, // Assuming the user ID is obtained from the auth middleware
             programId,
             programType,
@@ -165,20 +166,61 @@ export const getApplicationsByProgram = async (req, res) => {
 };
 
 export const getApplicationById = async (req, res) => {
-    try { 
-        
+    try {
         const { programId } = req.params;
-        const application = await applicationModel.findOne({ programId,userId:req.user._id });
+        const userId = req.user._id;
 
-        if (!application) {
-            return res.status(404).json({ message: "Application not found" });
+        // Step 1: Check for an application for the specific programId
+        const applicationForProgram = await applicationModel.findOne({ programId, userId });
+
+        if (applicationForProgram) {
+            return res.status(200).json({ 
+                application: applicationForProgram, 
+                editable: true, // The user can edit this application 
+            });
         }
-        return res.status(200).json({ application });
+
+        // Step 2: Retrieve the program type of the requested program
+        const program = await programModel.findById(programId);
+        if (!program) {
+            return res.status(404).json({ message: "Program not found" });
+        }
+
+        // Step 3: Look for an application of the same program type
+        const applicationByType = await applicationModel.findOne({ 
+            programType: program.type, 
+            userId 
+        });
+
+        if (applicationByType) {
+            return res.status(200).json({ 
+                application: applicationByType, 
+                editable: false, // This application cannot be edited, only used to pre-fill 
+            });
+        }
+
+        // Step 4: Fallback - Fetch the most recent application by the user
+        const mostRecentApplication = await applicationModel.findOne({ userId }).sort({ updatedAt: -1 });
+
+        if (mostRecentApplication) {
+            return res.status(200).json({ 
+                application: mostRecentApplication, 
+                editable: false, // This application cannot be edited, only used to pre-fill 
+            });
+        }
+
+        // Step 5: No applications found
+        return res.status(200).json({ application: null, editable: false });
+
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Internal server error", error: error.message });
+        return res.status(500).json({ 
+            message: "Internal server error", 
+            error: error.message 
+        });
     }
 };
+
 
 export const updateApplication = async (req, res) => {
     try {

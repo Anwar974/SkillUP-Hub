@@ -13,7 +13,8 @@ export const postProgram = async (req, res) => {
 
     try{
       // majors
-        const { title, description, company, location, mode, type, startDate, endDate,hasApplicationForm, categoryId } = req.body;
+        const { title, description, company, location, mode, type, startDate,
+           endDate,hasApplicationForm,majors, categoryId } = req.body;
         const userId = req.user._id; 
 
         const userExists = await userModel.findById(userId);
@@ -29,7 +30,7 @@ export const postProgram = async (req, res) => {
         const checkCompany = await companyModel.findById(company);
         if (!checkCompany) {
             return res.status(404).json({ message: "Company not found" });
-        }
+        }    
 
         const existingProgram = await programModel.findOne({
             title,
@@ -51,7 +52,7 @@ export const postProgram = async (req, res) => {
             company,
             location : location || undefined,
             mode,
-            type,
+            type: mode === 'online' ? undefined : type,
             startDate,
             endDate,
             hasApplicationForm: hasApplicationForm ?? false,
@@ -61,6 +62,10 @@ export const postProgram = async (req, res) => {
             updatedBy: userId
         });
 
+        // Add majors if hasApplicationForm is true and type is 'international'
+        if (hasApplicationForm && type === 'international' && Array.isArray(majors)) {
+          program.majors = majors.map(major => major.trim());
+        }
         await program.save();
 
         await program.populate('company');
@@ -211,9 +216,7 @@ export const getInstructorPrograms = async (req, res, next) => {
     next(error); // Pass errors to the error-handling middleware
   }
 };
-
-
-  export const getProgramById = async (req, res) => {
+export const getProgramById = async (req, res) => {
     try {
 
 
@@ -249,8 +252,10 @@ export const getInstructorPrograms = async (req, res, next) => {
 export const updateProgram = async (req, res) => {
     try {
 // majors,
-        const { title, description, company, location, mode, startDate, endDate, hasApplicationForm, categoryId } = req.body;
-        const program = await programModel.findById(req.params.id);
+const { title, description, company, location, mode, type, startDate,
+  endDate,hasApplicationForm,majors, categoryId } = req.body;
+
+const program = await programModel.findById(req.params.id);
 
         if (!program) {
             return res.status(404).json({ message: "Program not found" });
@@ -269,6 +274,14 @@ export const updateProgram = async (req, res) => {
         if (location) program.location = location;
         // if (majors) program.majors = majors;
 
+        if (hasApplicationForm !== undefined) {
+          if (hasApplicationForm && type === 'international' && Array.isArray(majors)) {
+            program.majors = majors.map(major => major.trim());
+          } else{
+              program.majors = [];
+          }
+      }
+
         if (mode) program.mode = mode;
         if (startDate) program.startDate = new Date(startDate);
         if (endDate) program.endDate = new Date(endDate);
@@ -286,6 +299,8 @@ export const updateProgram = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", error: err.message });
     }
 };
+
+
 export const toggleBookmark = async (req, res) => {
     try {
       const { id } = req.params;

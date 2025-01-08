@@ -8,12 +8,46 @@ import Joi from 'joi';
    company: Joi.string().required(),
    location: Joi.string().optional(),
    mode: Joi.string().valid('online', 'offline', 'hybrid').default('offline'),
-   type: Joi.string().valid('local', 'international','online').required(),
-  
-  //  majors: Joi.array().items(Joi.string().optional()).min(1).optional(),
-   startDate: Joi.date().required(),
-   endDate: Joi.date().required(),
+   type: Joi.string().valid('local', 'international').required(),
    hasApplicationForm: Joi.boolean().default(false),
+   majors: Joi.array()
+   .items(Joi.string())
+   .min(1)
+   .optional()
+   .when('hasApplicationForm', {
+       is: true,
+       then: Joi.array().when('type', {
+           is: 'international',
+           then: Joi.optional(),
+           otherwise: Joi.forbidden().messages({
+               'any.forbidden': 'Majors should not be provided for local programs with an application form.',
+           }),
+       }),
+       otherwise: Joi.forbidden().messages({
+           'any.forbidden': 'Majors should not be provided if the program does not have an application form.',
+       }),
+   }),
+   majors: Joi.array()
+   .items(Joi.string())
+   .min(1)
+   .optional()
+   .when('hasApplicationForm', {
+       is: true,
+       then: Joi.array().when('type', {
+           is: 'international',
+           then: Joi.required().messages({
+               'any.required': 'Majors are required for international programs with an application form.',
+           }),
+           otherwise: Joi.forbidden().messages({
+               'any.forbidden': 'Majors should not be provided for local programs with an application form.',
+           }),
+       }),
+       otherwise: Joi.forbidden().messages({
+           'any.forbidden': 'Majors should not be provided if the program does not have an application form.',
+       }),
+   }),
+    startDate: Joi.date().required(),
+   endDate: Joi.date().required(),
    categoryId: Joi.string().hex().length(24).required(),
 
  })
@@ -24,11 +58,30 @@ import Joi from 'joi';
    description: Joi.string().optional(),
    company: Joi.string().optional(),
    location: Joi.string().optional(),
-  //  majors: Joi.string().optional(),
    mode: Joi.string().valid('online', 'offline', 'hybrid').optional(),
+   type: Joi.string().valid('local', 'international').required(),
+   hasApplicationForm: Joi.boolean().default(false).optional(),
+   majors: Joi.array()
+   .items(Joi.string())
+   .min(1)
+   .optional()
+   .when('hasApplicationForm', {
+       is: true,
+       then: Joi.array().when('type', {
+           is: 'international',
+           then: Joi.required().messages({
+               'any.required': 'Majors are required for international programs with an application form.',
+           }),
+           otherwise: Joi.forbidden().messages({
+               'any.forbidden': 'Majors should not be provided for local programs with an application form.',
+           }),
+       }),
+       otherwise: Joi.forbidden().messages({
+           'any.forbidden': 'Majors should not be provided if the program does not have an application form.',
+       }),
+   }),
    startDate: Joi.date().optional(), 
    endDate: Joi.date().optional(),
-   hasApplicationForm: Joi.boolean().default(false).optional(),
    categoryId: Joi.string().hex().length(24).optional(),
 });
 
