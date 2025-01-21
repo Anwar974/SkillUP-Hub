@@ -4,7 +4,7 @@ import initApp from './src/app.router.js';
 import connectDB from './db/connection.js';
 import cors from 'cors';
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const allowedOrigins = ["http://localhost:5173","https://skillup-front.onrender.com"];
 app.use(cors({
     origin: (origin, callback) => {

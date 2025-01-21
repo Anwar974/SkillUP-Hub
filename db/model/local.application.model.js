@@ -2,10 +2,25 @@ import applicationModel from "./application.model.js";
 import mongoose, { Schema, Types, model } from "mongoose";
 
 const localApplicationSchema = new Schema({
-
-    major: {
+    trainingsParticipatedIn: {
         type: String,
-        required: true
+        required: false,
+    },
+    awardsReceived: {
+        type: String,
+        required: false,
+    },
+    socialLinks: {
+        facebook: {
+            type: String,
+        },
+        linkedIn: {
+            type: String,
+        },
+        github: {
+            type: String,
+        },
+        
     },
 });
 

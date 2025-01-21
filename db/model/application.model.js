@@ -1,5 +1,4 @@
 import mongoose, { Schema, Types, model } from "mongoose";
-import reviewModel from "./review.model.js";
 
 const applicationSchema = new Schema({
     
@@ -37,10 +36,6 @@ const applicationSchema = new Schema({
         type: String,
         required: true,
         unique: false
-    },
-    major: {
-        type: String,
-        required: true
     },
     gender:{
         type:String,
@@ -103,10 +98,14 @@ const applicationSchema = new Schema({
         type: String,
         required: true
     },
+    major: {
+        type: String,
+        required: true
+    },
 },
 {
     timestamps:true,
-    // discriminatorKey: 'applicationType',
+    discriminatorKey: 'applicationType',
 });
 
 

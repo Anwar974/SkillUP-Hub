@@ -1,6 +1,7 @@
 import Joi from 'joi';
 
  export const postApplicationSchema = Joi.object({
+
     programId: Joi.string().hex().length(24),
     status: Joi.string().valid('Pending', 'Rejected', 'Accepted').default('Pending'),
     appliedAt: Joi.date(),
@@ -21,22 +22,65 @@ import Joi from 'joi';
     major: Joi.string().required(),
     notes: Joi.string().optional(),
 
-    // passportInfo: Joi.when('programType', {
-    //     is: 'international',
-    //     then: Joi.string().valid('جواز فلسطيني', 'جواز أردني', 'جواز سفر آخر', 'لا املك جواز سفر').required(),
-    //     otherwise: Joi.forbidden(), 
-    // }),
-    // visa: Joi.when('programType', {
-    //     is: 'international',
-    //     then: Joi.string().required(),
-    //     otherwise: Joi.forbidden(),
-    // }),
-    // localId: Joi.when('programType', {
-    //     is: 'local',
-    //     then: Joi.string().required(),
-    //     otherwise: Joi.forbidden(),
-    // }),
+    // International-specific fields
+     isRegisteredThisSemester: Joi.when('programType', {
+        is: 'international',
+        then: Joi.boolean().required(),
+        otherwise: Joi.forbidden(),
+    }),
+    hasDisciplinaryActions: Joi.when('programType', { is: 'international', then: Joi.boolean().required(), otherwise: Joi.forbidden(),
+    }),
+    nationality: Joi.when('programType', { is: 'international', then: Joi.string().required(), otherwise: Joi.forbidden(),
+    }),
+    passportInfo: Joi.when('programType', {
+        is: 'international',
+        then: Joi.alternatives().try(
+            Joi.string().valid('جواز فلسطيني', 'جواز أردني', 'جواز سفر آخر', 'لا أملك جواز سفر'),
+            Joi.string().min(1) // Allow any string (custom values)
+        ).required(),
+        otherwise: Joi.forbidden(),
+    }),
+    isPassportValid: Joi.when('programType', { is: 'international', then: Joi.boolean().required(), otherwise: Joi.forbidden(),
+    }),
+    academicDegree: Joi.when('programType', {
+        is: 'international',
+        then: Joi.string()
+            .valid('بكالوريوس', 'ماجستير', 'دكتوراه')
+            .required(),
+        otherwise: Joi.forbidden(),
+    }),
+    hasTravelRestrictions: Joi.when('programType', { is: 'international', then: Joi.boolean().required(), otherwise: Joi.forbidden(),
+    }),
+    hasEUVisa: Joi.when('programType', { is: 'international', then: Joi.boolean().required(), otherwise: Joi.forbidden(),
+    }),
+    visaDetails: Joi.when('programType', { is: 'international',
+        then: Joi.when('hasEUVisa', {
+            is: true,
+            then: Joi.string().required(),
+            otherwise: Joi.string().optional(),
+        }),
+        otherwise: Joi.forbidden(),
+    }),
+   
+
+
+// local 
     
+    trainingsParticipatedIn: Joi.when('programType',  {is: 'local', then: Joi.string().optional(), otherwise: Joi.forbidden(),
+    }),
+    
+    awardsReceived: Joi.when('programType', { is: 'local', then: Joi.string().optional(),otherwise: Joi.forbidden(),
+    }),
+    socialLinks: Joi.when('programType', {
+        is: 'local',
+        then: Joi.object({
+            facebook: Joi.string().uri().optional(),
+            linkedIn: Joi.string().uri().optional(),
+            github: Joi.string().uri().optional(),
+        }).required(),
+        otherwise: Joi.forbidden(),
+    }),
+
 });
 
 
@@ -59,6 +103,69 @@ export const updateApplicationSchema = Joi.object({
     notes: Joi.string().optional(),
     programType: Joi.string().optional(),
     major: Joi.string().optional(),
+
+     // for international 
+
+     isRegisteredThisSemester: Joi.when('programType', {is: 'international',then: Joi.boolean().optional(),otherwise: Joi.forbidden(),
+    }),
+
+    hasDisciplinaryActions: Joi.when('programType', {is: 'international', then: Joi.boolean().optional(), otherwise: Joi.forbidden(),
+    }),
+
+    nationality: Joi.when('programType', { is: 'international', then: Joi.string().optional(), otherwise: Joi.forbidden(),
+    }),
+
+    passportInfo: Joi.when('programType', {is: 'international',
+        then: Joi.string()
+            .valid('جواز فلسطيني', 'جواز أردني', 'جواز سفر آخر', 'لا أملك جواز سفر')
+            .optional(),
+        otherwise: Joi.forbidden(),
+    }),
+
+    isPassportValid: Joi.when('programType', {is: 'international',then: Joi.boolean().optional(),otherwise: Joi.forbidden(),
+    }),
+
+    academicDegree: Joi.when('programType', { is: 'international',
+        then: Joi.string().valid('بكالوريوس', 'ماجستير', 'دكتوراه').optional(),
+        otherwise: Joi.forbidden(),
+    }),
+
+    hasTravelRestrictions: Joi.when('programType', {is: 'international',then: Joi.boolean().optional(),otherwise: Joi.forbidden(),
+    }),
+
+    hasEUVisa: Joi.when('programType', {is: 'international',then: Joi.boolean().optional(),otherwise: Joi.forbidden(),
+    }),
+
+    visaDetails: Joi.when('programType', {
+        is: 'international',
+        then: Joi.when('hasEUVisa', {is: true, then: Joi.string().optional(), otherwise: Joi.string().optional(),
+        }),
+        otherwise: Joi.forbidden(),
+    }),
+
+
+
+// local 
+    trainingsParticipatedIn: Joi.when('programType', { is: 'local', then: Joi.array().items(Joi.string()).optional(),
+        otherwise: Joi.forbidden(),
+    }),
+    
+    awardsReceived: Joi.when('programType', {is: 'local', then: Joi.array().items(Joi.string()).optional(),
+        otherwise: Joi.forbidden(),
+    }),
+    socialLinks: Joi.when('programType', {
+        is: 'local',
+        then: Joi.object({
+            facebook: Joi.string().uri().optional(),
+            linkedIn: Joi.string().uri().optional(),
+            github: Joi.string().uri().optional(),
+        }).required(),
+        otherwise: Joi.forbidden(),
+    }),
+
+    
+
+
 
 });
 

@@ -1,6 +1,6 @@
 import applicationModel from "../../../db/model/application.model.js";
-// import InternationalApplication from "../../../db/model/international.application.model.js";
-// import LocalApplication from "../../../db/model/local.application.model.js";
+import InternationalApplication from "../../../db/model/international.application.model.js";
+import LocalApplication from "../../../db/model/local.application.model.js";
 import programModel from "../../../db/model/program.model.js";
 import { sendEmail } from "../../ults/email.js";
 import { enrollmentStatusChangeEmailTemplate, statusChangeEmailTemplate } from "../../ults/emailTemplete.js";
@@ -28,9 +28,10 @@ export const postApplication = async (req, res) => {
 
         const { programId } = req.params;
         const { arabicName, englishName, email, phone, studentId, gender, gradeEnglish1, gradeEnglish2, gba,
-        hoursPassed, year, fieldTrainingsPassed,branch, notes, major } = req.body;
-
-// visa,localId
+        hoursPassed, year, fieldTrainingsPassed, branch, notes, major, 
+        isRegisteredThisSemester, hasDisciplinaryActions, nationality, passportInfo, isPassportValid, 
+        academicDegree, hasTravelRestrictions, hasEUVisa, visaDetails,
+        trainingsParticipatedIn, awardsReceived, socialLinks } = req.body;
 
         const program = await programModel.findById(programId);
 
@@ -45,8 +46,6 @@ export const postApplication = async (req, res) => {
         const programType = program.type;
         req.body.programType = programType;
 
-
-    
         const existingApplication = await applicationModel.findOne({ userId:req.user._id, programId });
         
         if (existingApplication) {
@@ -54,7 +53,7 @@ export const postApplication = async (req, res) => {
         }
 
         // Create the application
-        const applicationData ={
+        let applicationData ={
             arabicName,
             englishName,
             studentId,
@@ -69,27 +68,39 @@ export const postApplication = async (req, res) => {
             fieldTrainingsPassed,
             branch,
             notes,
-            major,
             userId: req.user._id, // Assuming the user ID is obtained from the auth middleware
             programId,
             programType,
+            major, // Store the selected or custom major
             appliedAt: new Date(),
         };
 
         let newApplication;
 
-        // if (programType === 'international') {
-        //     applicationData.passportInfo = passportInfo;
-        //     applicationData.visa = visa;
-        //     newApplication = new InternationalApplication(applicationData);
+        if (programType === 'international') {
+          applicationData.isRegisteredThisSemester = isRegisteredThisSemester;
+          applicationData.hasDisciplinaryActions = hasDisciplinaryActions;
+          applicationData.nationality = nationality;
+          applicationData.passportInfo = passportInfo;
+          applicationData.isPassportValid = isPassportValid;
+          applicationData.academicDegree = academicDegree;
+          applicationData.hasTravelRestrictions = hasTravelRestrictions;
+          applicationData.hasEUVisa = hasEUVisa;
+          applicationData.visaDetails = hasEUVisa ? visaDetails : undefined; // Only add visaDetails if hasEUVisa is true
+          newApplication = new InternationalApplication(applicationData);
             
+        } else if (programType === 'local'){
+           applicationData.trainingsParticipatedIn = trainingsParticipatedIn;
+           applicationData.awardsReceived = awardsReceived;
+           applicationData.socialLinks = socialLinks;
 
-        // } else if (programType === 'local'){
-        //     applicationData.localId = localId;
-        //     newApplication = new LocalApplication(applicationData);
-        // }
+            newApplication = new LocalApplication(applicationData);
+        }else{
 
         newApplication = new applicationModel(applicationData);
+
+        }
+
 
         await newApplication.save();
 
