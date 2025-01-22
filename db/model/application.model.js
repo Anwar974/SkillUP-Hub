@@ -102,6 +102,10 @@ const applicationSchema = new Schema({
         type: String,
         required: true
     },
+    message: {
+        type: String,
+        required: false,
+    }
 },
 {
     timestamps:true,

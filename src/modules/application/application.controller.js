@@ -237,15 +237,20 @@ export const updateApplication = async (req, res) => {
     try {
         const { programId, id } = req.params;
         const updateData = req.body;
-        const application = await applicationModel.findOneAndUpdate({ _id: id, programId }, updateData, { new: true });
+        const application = await applicationModel.findOne({ _id: id, programId });
+
+        if (!application) {
+            return res.status(404).json({ message: "Application not found" });
+        }
+
+        Object.assign(application, updateData);
 
         if (updateData.status === 'Accepted') {
             application.enrollmentStatus = 'Enrolled';
         }
 
-        if (!application) {
-            return res.status(404).json({ message: "Application not found" });
-        }
+        await application.save();
+
         return res.status(200).json({ message: "Application updated successfully", application });
     } catch (error) {
         console.error(error);
@@ -256,35 +261,36 @@ export const updateApplication = async (req, res) => {
 export const updateApplicationStatus = async (req, res) => {
 
     const { programId, id } = req.params;
-    const {status}  = req.body; 
-    const application = await applicationModel.findOneAndUpdate({ _id: id, programId }, { status }, { new: true })
+    const {status, message}  = req.body; 
+    
+
+    const application = await applicationModel.findOneAndUpdate(
+        { _id: id, programId }, { status }, { new: true })
     .populate('programId', 'title');
+
     if (!application) {
         return res.status(404).json({ message: "Application not found" });
     }
-
-     if (application.status === 'Accepted') {
-        return res.status(400).json({ message: "You cannot change Accpeted status." });
-    }
-
-    application.status = status;
     
     if (status === 'Accepted') {
         application.enrollmentStatus = 'Enrolled';
-        await application.save();
     }else{
         application.enrollmentStatus = 'Off Track';
-        await application.save();
+        
     }
+    await application.save();
 
     if(application.status==='Accepted' || 'Rejected') {
     await sendEmail(
-        application.email, // Replace with the appropriate field for the user's email
+        application.email,
         `Your application for program has been
          ${status}`,
         statusChangeEmailTemplate,
         { userName: application.englishName.split(" ")[0],
-         newStatus: status, programTitle: application.programId.title }
+         newStatus: status,
+          programTitle: application.programId.title,
+          message: message,
+         }
     );}
 
     return res.status(200).json({ message: "success", application });
@@ -293,7 +299,7 @@ export const updateApplicationStatus = async (req, res) => {
 
 export const updateEnrollmentStatus = async (req, res) => {
     const { id } = req.params;
-    const { enrollmentStatus } = req.body;
+    const { enrollmentStatus, message } = req.body;
 
     const application = await applicationModel.findById(id).populate('programId', 'title');
     
@@ -317,8 +323,11 @@ export const updateEnrollmentStatus = async (req, res) => {
         application.email, // Replace with the appropriate field for the user's email
         `Enrollment Status Updated to ${enrollmentStatus}`,
         enrollmentStatusChangeEmailTemplate,
-        { userName: application.englishName.split(" ")[0], newEnrollmentStatus: enrollmentStatus,
-            programTitle: application.programId.title 
+        { userName: application.englishName.split(" ")[0],
+             newEnrollmentStatus: enrollmentStatus,
+            programTitle: application.programId.title ,
+            message: message, // Include the custom message or default text
+
         }
     );
 

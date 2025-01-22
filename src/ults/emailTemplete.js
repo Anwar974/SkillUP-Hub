@@ -192,7 +192,7 @@ export const sendCodeTemplate =( {userName,code}) => {
     `;
 }
 
-export const statusChangeEmailTemplate = ({ userName, newStatus, programTitle }) => {
+export const statusChangeEmailTemplate = ({ userName, newStatus, programTitle,message }) => {
 
     if(newStatus==='Accepted'){
         return `
@@ -200,6 +200,11 @@ export const statusChangeEmailTemplate = ({ userName, newStatus, programTitle })
       border-radius: 8px;  color: #333;">
         <h2 style="color: #4640DE;">Hello ${userName},</h2>
         <p style="font-size: 16px;">We wanted to inform you that your application for the program <strong>"${programTitle}"</strong> has been <span style="color: #4CAF50; font-weight: bold;">${newStatus}</span>.</p>
+        ${
+            message
+                ? `<p style="font-size: 16px; color: #333;"><strong>Message from your instructor:</strong><br>${message}</p>`
+                : ''
+        }
        <p style="font-size: 14px;">If you have any questions or need further assistance, contact with your instructor.</p>
         <p style="font-size: 14px; margin-top: 20px;">Thank you,<br><strong>SkillUP HUB Admin</strong></p>
          <img src="https://res.cloudinary.com/dh37z23kg/image/upload/v1735402002/Skill%20UP/images/4155938_ovrqar.jpg"
@@ -215,7 +220,11 @@ export const statusChangeEmailTemplate = ({ userName, newStatus, programTitle })
         <h2 style="color: #4640DE;">Hello ${userName},</h2>
         <p style="font-size: 16px;">Thank you for applying to the <strong>${programTitle}</strong> program.
         After careful consideration, we regret to inform you that your application was not successful at this time.</p>
-        <p style="font-size: 16px;">We encourage you to reapply in the future or explore resources to support your goals.</p>
+        ${
+            message
+                ? `<p style="font-size: 16px; color: #333;"><strong>Message from your instructor:</strong><br>${message}</p>`
+                : '<p style="font-size: 16px;">We encourage you to reapply in the future or explore resources to support your goals.</p>'
+        }
         <p style="font-size: 14px; margin-top: 20px;">Thank you,<br><strong>SkillUP HUB Admin</strong></p>
         </div>
         `;
@@ -224,7 +233,7 @@ export const statusChangeEmailTemplate = ({ userName, newStatus, programTitle })
     
 };
 
-export const enrollmentStatusChangeEmailTemplate = ({ userName, newEnrollmentStatus, programTitle }) => {
+export const enrollmentStatusChangeEmailTemplate = ({ userName, newEnrollmentStatus, programTitle,message }) => {
     let statusMessage;
 
     // Customize message based on enrollment status
@@ -252,6 +261,11 @@ export const enrollmentStatusChangeEmailTemplate = ({ userName, newEnrollmentSta
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #4640DE; border-radius: 8px; color: #333;">
         <h2 style="color: #4640DE;">Hello ${userName},</h2>
         <p style="font-size: 16px;">${statusMessage}</p>
+         ${
+            message
+                ? `<p style="font-size: 16px; color: #333;"><strong>Message from your instructor:</strong><br>${message}</p>`
+                : ''
+        }
         <p style="font-size: 16px;">If you have any questions or need further clarification, contact your instructor.</p>
         <p style="font-size: 14px; margin-top: 20px;">Best regards,<br><strong>SkillUP HUB Team</strong></p>
     </div>

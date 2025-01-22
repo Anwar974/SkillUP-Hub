@@ -10,7 +10,7 @@ const router = Router({mergeParams:true});
 router.post('/',asyncHandler(controller.addProgramType),validation(schema.postApplicationSchema), auth(endpoints.post), asyncHandler(controller.postApplication));
 router.get('/', asyncHandler(controller.getApplicationsByProgram));
 router.get('/user-application', auth(endpoints.myApplication), controller.getApplicationById);
-router.patch('/:id', validation(schema.updateApplicationSchema), auth(endpoints.update), asyncHandler(controller.updateApplication));
+router.patch('/:id',asyncHandler(controller.addProgramType), validation(schema.updateApplicationSchema), auth(endpoints.update), asyncHandler(controller.updateApplication));
 router.patch('/:id/update-status', validation(schema.updateApplicationStatusSchema), auth(endpoints.updateStatus), asyncHandler(controller.updateApplicationStatus))
 router.patch('/:id/enrollment-status', validation(schema.updateEnrollmentStatusSchema), auth(endpoints.updateStatus), asyncHandler(controller.updateEnrollmentStatus));;
 router.delete('/', validation(schema.deleteByStatusSchema), auth(endpoints.delete), asyncHandler(controller.deleteByStatus));

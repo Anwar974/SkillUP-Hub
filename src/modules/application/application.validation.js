@@ -64,11 +64,9 @@ import Joi from 'joi';
    
 
 
-// local 
-    
+// local  
     trainingsParticipatedIn: Joi.when('programType',  {is: 'local', then: Joi.string().optional(), otherwise: Joi.forbidden(),
-    }),
-    
+    }), 
     awardsReceived: Joi.when('programType', { is: 'local', then: Joi.string().optional(),otherwise: Joi.forbidden(),
     }),
     socialLinks: Joi.when('programType', {
@@ -106,39 +104,41 @@ export const updateApplicationSchema = Joi.object({
 
      // for international 
 
-     isRegisteredThisSemester: Joi.when('programType', {is: 'international',then: Joi.boolean().optional(),otherwise: Joi.forbidden(),
+     isRegisteredThisSemester: Joi.when('programType', {is: 'international',then: Joi.boolean().required(),otherwise: Joi.forbidden(),
     }),
 
-    hasDisciplinaryActions: Joi.when('programType', {is: 'international', then: Joi.boolean().optional(), otherwise: Joi.forbidden(),
+    hasDisciplinaryActions: Joi.when('programType', {is: 'international', then: Joi.boolean().required(), otherwise: Joi.forbidden(),
     }),
 
-    nationality: Joi.when('programType', { is: 'international', then: Joi.string().optional(), otherwise: Joi.forbidden(),
+    nationality: Joi.when('programType', { is: 'international', then: Joi.string().required(), otherwise: Joi.forbidden(),
     }),
 
-    passportInfo: Joi.when('programType', {is: 'international',
-        then: Joi.string()
-            .valid('جواز فلسطيني', 'جواز أردني', 'جواز سفر آخر', 'لا أملك جواز سفر')
-            .optional(),
+    passportInfo: Joi.when('programType', {
+        is: 'international',
+        then: Joi.alternatives().try(
+            Joi.string().valid('جواز فلسطيني', 'جواز أردني', 'جواز سفر آخر', 'لا أملك جواز سفر'),
+            Joi.string().min(1) 
+        ).required(),
         otherwise: Joi.forbidden(),
     }),
 
-    isPassportValid: Joi.when('programType', {is: 'international',then: Joi.boolean().optional(),otherwise: Joi.forbidden(),
+    isPassportValid: Joi.when('programType', {is: 'international',then: Joi.boolean().required(),otherwise: Joi.forbidden(),
     }),
 
     academicDegree: Joi.when('programType', { is: 'international',
-        then: Joi.string().valid('بكالوريوس', 'ماجستير', 'دكتوراه').optional(),
+        then: Joi.string().valid('بكالوريوس', 'ماجستير', 'دكتوراه').required(),
         otherwise: Joi.forbidden(),
     }),
 
-    hasTravelRestrictions: Joi.when('programType', {is: 'international',then: Joi.boolean().optional(),otherwise: Joi.forbidden(),
+    hasTravelRestrictions: Joi.when('programType', {is: 'international',then: Joi.boolean().required(),otherwise: Joi.forbidden(),
     }),
 
-    hasEUVisa: Joi.when('programType', {is: 'international',then: Joi.boolean().optional(),otherwise: Joi.forbidden(),
+    hasEUVisa: Joi.when('programType', {is: 'international',then: Joi.boolean().required(),otherwise: Joi.forbidden(),
     }),
 
     visaDetails: Joi.when('programType', {
         is: 'international',
-        then: Joi.when('hasEUVisa', {is: true, then: Joi.string().optional(), otherwise: Joi.string().optional(),
+        then: Joi.when('hasEUVisa', {is: true, then: Joi.string().required(), otherwise: Joi.string().optional(),
         }),
         otherwise: Joi.forbidden(),
     }),
@@ -153,15 +153,17 @@ export const updateApplicationSchema = Joi.object({
     awardsReceived: Joi.when('programType', {is: 'local', then: Joi.array().items(Joi.string()).optional(),
         otherwise: Joi.forbidden(),
     }),
-    socialLinks: Joi.when('programType', {
-        is: 'local',
-        then: Joi.object({
-            facebook: Joi.string().uri().optional(),
-            linkedIn: Joi.string().uri().optional(),
-            github: Joi.string().uri().optional(),
-        }).required(),
-        otherwise: Joi.forbidden(),
-    }),
+    socialLinks: Joi.object({
+        facebook: Joi.string().uri().optional(),
+        linkedIn: Joi.string().uri().optional(),
+        github: Joi.string().uri().optional(),
+      })
+        .optional()
+        .when('programType', {
+          is: 'local',
+          then: Joi.required(),
+          otherwise: Joi.forbidden(),
+        }),
 
     
 
@@ -173,12 +175,15 @@ export const updateApplicationStatusSchema = Joi.object({
     programId: Joi.string().hex().length(24),
     id: Joi.string().required(), 
     status: Joi.string().valid('Pending','Rejected','Accepted').required(),
+    message: Joi.string().optional(),
 });
 
 export const updateEnrollmentStatusSchema = Joi.object({
     programId: Joi.string().hex().length(24),
     id: Joi.string().required(), 
     enrollmentStatus: Joi.string().valid('Enrolled', 'Passed', 'Failed', 'Off Track').required(),
+    message: Joi.string().optional(),
+
 });
 
 export const deleteByStatusSchema = Joi.object({
