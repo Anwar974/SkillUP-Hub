@@ -338,8 +338,9 @@ export const deleteProgram = async (req, res) => {
     if (!program) {
         return res.status(404).json({ message: "Program not found" });
     }
-    await programModel.findByIdAndDelete(id);
-    res.status(200).json({ message: "Program deleted successfully" });
+    program.status = 'NotActive'
+    await program.save();
+    res.status(200).json({ message: "success" });
 };
 
 

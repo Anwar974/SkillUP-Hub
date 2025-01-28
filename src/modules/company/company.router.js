@@ -15,6 +15,6 @@ router.get('/', asyncHandler(controller.getCompanies));
 router.get('/:userId/companies',auth(endpoints.get), asyncHandler(controller.getInstructorCompanies));
 router.get('/:id', asyncHandler(controller.getCompanyById));
 router.patch('/:id',fileUpload(fileType.image).single('image'), validation(schema.updateCompanySchema), auth(endpoints.update), controller.updateCompany);
-// router.delete('/:id', validation(schema.deleteCompanySchema),auth(endpoints.delete), controller.deleteCompany);
+router.delete('/:id', validation(schema.deleteCompanySchema),auth(endpoints.delete), controller.deleteCompany);
 
 export default router;

@@ -16,6 +16,19 @@ export const postCopmany = async (req, res) => {
             return res.status(409).json({message:"company already exists"});
         }
 
+         // Check if the email in socialLinks is unique
+    if (req.body.socialLinks && req.body.socialLinks.email) {
+      const existingCompany = await companyModel.findOne({
+        "socialLinks.email": req.body.socialLinks.email,
+      });
+
+      if (existingCompany) {
+        return res
+          .status(409)
+          .json({ message: "Email is already associated with another company" });
+      }
+    }
+
         req.body.slug = slugify(req.body.companyName);
 
         const {secure_url,public_id} = await cloudinary.uploader.upload(req.file.path,{
@@ -235,14 +248,66 @@ export const updateCompany = async (req, res) => {
 
 }
 
-// export const deleteCompany = async (req, res) => {
+export const deleteCompany = async (req, res) => {
+  try {
+    // Find the company by ID
+    const company = await companyModel.findById(req.params.id);
+    if (!company) {
+        return res.status(404).json({ message: "company not found" });
+    }
 
-//     // Find the company by ID
-//     const company = await companyModel.findByIdAndDelete(req.params.id);
-//     if (!company) {
-//         return res.status(404).json({ message: "company not found" });
-//     }
-//     await cloudinary.uploader.destroy(company.image.public_id)
-//     return res.status(200).json({message:"success",company});
-// }
+    const programs = await programModel.find({ company: company._id });
+    if (programs.length > 0) {
+      company.status = "NotActive";
+      await company.save();
+
+return res.status(200).json({
+        message: "success",
+        
+      });
+    }
+
+    if (company.image && company.image.public_id) {
+      await cloudinary.uploader.destroy(company.image.public_id);
+    }
+
+    await companyModel.findByIdAndDelete(req.params.id);
+
+    return res.status(200).json({message:"success",company});
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    return res.status(500).json({ message: "Internal server error", error });
+  }
+}
+
+export const destroy = async (req, res) => {
+  try {
+    const category = await categoryModel.findById(req.params.id);
+
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    const programs = await programModel.find({ categoryId: category._id });
+    if (programs.length > 0) {
+      category.status = "NotActive"; // Adjust the field name and value as per your schema
+      await category.save();
+
+return res.status(200).json({
+        message: "success",
+      });
+    }
+
+    if (category.image && category.image.public_id) {
+      await cloudinary.uploader.destroy(category.image.public_id);
+    }
+
+    await categoryModel.findByIdAndDelete(req.params.id);
+
+    return res.status(200).json({ message: "success", category });
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    return res.status(500).json({ message: "Internal server error", error });
+  }
+};
 

@@ -4,7 +4,7 @@ export const endpoints ={
     createUser: [roles.Admin],
     deactivateAccount: [roles.User,roles.Instructor],
     changeUserStatus : [roles.Admin],
-    editProfile : [roles.Instructor],
+    editProfile : [roles.Instructor,roles.User],
     getUsers: [roles.Admin],
     getBookmarks: [roles.User],
     myApplications: [roles.User],

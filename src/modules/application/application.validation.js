@@ -146,7 +146,7 @@ export const updateApplicationSchema = Joi.object({
 
 
 // local 
-    trainingsParticipatedIn: Joi.when('programType', { is: 'local', then: Joi.array().items(Joi.string()).optional(),
+    trainingsParticipatedIn: Joi.when('programType', { is: 'local', then: Joi.string().optional(),
         otherwise: Joi.forbidden(),
     }),
     
@@ -175,14 +175,14 @@ export const updateApplicationStatusSchema = Joi.object({
     programId: Joi.string().hex().length(24),
     id: Joi.string().required(), 
     status: Joi.string().valid('Pending','Rejected','Accepted').required(),
-    message: Joi.string().optional(),
+    message: Joi.string().allow('', null).optional(),
 });
 
 export const updateEnrollmentStatusSchema = Joi.object({
     programId: Joi.string().hex().length(24),
     id: Joi.string().required(), 
     enrollmentStatus: Joi.string().valid('Enrolled', 'Passed', 'Failed', 'Off Track').required(),
-    message: Joi.string().optional(),
+    message: Joi.string().allow('', null).optional(),
 
 });
 

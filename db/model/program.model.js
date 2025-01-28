@@ -64,6 +64,12 @@ const programSchema = new Schema({
         required:true,
 
     },
+    status:{
+        type:String,
+        default:'Active',
+        enum:['Active','NotActive'],
+
+    },
     createdBy:{
         type:Types.ObjectId,
         ref:'User'

@@ -157,6 +157,7 @@ export const editProfile = async (req, res) => {
             };
         }
         if (gender) user.gender = gender;
+
         if (department) user.department = department;
 
         await user.save();
@@ -202,7 +203,7 @@ export const getMyApplications = async (req, res) => {
     try { 
         
         const applications = await applicationModel.find({userId:req.user._id })
-        .select("arabicName englishName email appliedAt status enrollmentStatus")
+        .select("arabicName englishName email appliedAt status enrollmentStatus programType programId")
         .populate('programId','title');
 
         return res.status(200).json({ applications });
