@@ -42,7 +42,6 @@ export const exportApplicationsToCSV = async (req, res) => {
         const userId =req.user._id;
         const queryObject = { createdBy: userId };
   
-        const count = await programModel.countDocuments(queryObject);
     
         const programs = await programModel
           .find(queryObject)
@@ -100,6 +99,88 @@ export const exportApplicationsToCSV = async (req, res) => {
 };
 
 
+export const exportApplicationsByProgram = async (req, res) => {
+    try{
+    const { programId } = req.params;
+  
+    const program = await programModel
+          .find({createdBy: programId})
+          .select("_id type"); // Select specific fields if provided in the query
+    
+    const applications = applicationModel.find({programId});
+   
+    let dataset;
+    
+    if(program.type === "international"){
+        dataset= applications.map((app) => ({
+            'Student Name (Arabic)': app.arabicName,
+            'Student Name (English)': app.englishName,
+            'Student ID': app.studentId,
+            'Email': app.email,
+            'Phone': app.phone,
+            'Grade English 1': app.gradeEnglish1,
+            'Grade English 2': app.gradeEnglish2,
+            'GBA': app.gba,
+            'Hours Passed': app.hoursPassed,
+            'Year': app.year,
+            'Field Trainings Passed': app.fieldTrainingsPassed,
+            'Notes': app.notes,
+            'Branch': app.branch,
+            'Gender': app.gender,
+            'Major': app.major,
+            'Registered This Semester': app.isRegisteredThisSemester ? 'Yes' : 'No',
+            'Has Disciplinary Actions': app.hasDisciplinaryActions ? 'Yes' : 'No',
+            'Nationality': app.nationality,
+            'Passport Info': app.passportInfo,
+            'Is Passport Valid': app.isPassportValid ? 'Yes' : 'No',
+            'Academic Degree': app.academicDegree,
+            'Has Travel Restrictions': app.hasTravelRestrictions ? 'Yes' : 'No',
+            'Has EU Visa': app.hasEUVisa ? 'Yes' : 'No',
+            'Visa Details': app.visaDetails,
+            'Status': app.status,
+            'Enrollment Status':app.enrollmentStatus,
+        }));
+    }else{
+        dataset= applications.map((app) => ({
+            'Student Name (Arabic)': app.arabicName,
+            'Student Name (English)': app.englishName,
+            'Student ID': app.studentId,
+            'Email': app.email,
+            'Phone': app.phone,
+            'Grade English 1': app.gradeEnglish1,
+            'Grade English 2': app.gradeEnglish2,
+            'GBA': app.gba,
+            'Hours Passed': app.hoursPassed,
+            'Year': app.year,
+            'Field Trainings Passed': app.fieldTrainingsPassed,
+            'Notes': app.notes,
+            'Branch': app.branch,
+            'Gender': app.gender,
+            'Major': app.major,
+            'Trainings Student Participated In':app.trainingsParticipatedIn,
+            'Awards Received':app.awardsReceived,
+            'Status': app.status,
+            'Enrollment Status':app.enrollmentStatus,
+        }));
+    }
+   
+    const csv = parse(dataset);
+
+    const bom = '\ufeff';
+    const csvWithBom = bom + csv;
+
+    const buffer = iconv.encode(csvWithBom, 'utf-8');
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename=applications.csv');
+
+    res.end(buffer);
+  
+} catch (error) {
+    console.error("Error exporting applications:", error);
+    res.status(500).json({ message: "Failed to export applications" });
+}
+};
 
 export const addProgramType = async (req, res, next) => {
     try {
@@ -210,6 +291,8 @@ export const postApplication = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 };
+
+
 
 export const getApplicationsByProgram = async (req, res) => {
     
