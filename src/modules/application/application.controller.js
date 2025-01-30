@@ -103,11 +103,9 @@ export const exportApplicationsByProgram = async (req, res) => {
     try{
     const { programId } = req.params;
   
-    const program = await programModel
-          .find({_id: programId, createdBy:req.user._id})
-          .select("_id type"); // Select specific fields if provided in the query
-    
-    const applications = applicationModel.find({programId});
+    const program = await programModel.findById(programId).select("_id type"); 
+
+          const applications = await applicationModel.find({ programId });
    
     let dataset;
     
