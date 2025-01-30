@@ -6,6 +6,100 @@ import { sendEmail } from "../../ults/email.js";
 import { enrollmentStatusChangeEmailTemplate, statusChangeEmailTemplate } from "../../ults/emailTemplete.js";
 import { ApplicationsPagination } from "../../ults/pagination.js";
 
+import { parse } from 'json2csv';
+import iconv from 'iconv-lite'; // Encoding conversion
+
+export const getInstructorPrograms = async (req, res, next) => {
+    try {
+      const userId = req.params.userId;
+  
+      const userExists = await userModel.findById(userId);
+      if (!userExists) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      const queryObject = { createdBy: userId };
+  
+      const count = await programModel.countDocuments(queryObject);
+  
+      const programs = await programModel
+        .find(queryObject)
+        .populate("company")
+        .populate("categoryId")
+        .select(req.query.fields); // Select specific fields if provided in the query
+  
+      return res.status(200).json({ message: "success", count, programs });
+  
+    } catch (error) {
+      next(error);
+    }
+  };
+  
+export const exportApplicationsToCSV = async (req, res) => {
+    try {
+
+        // Fetch applications from the database
+        const userId =req.user._id;
+        const queryObject = { createdBy: userId };
+  
+        const count = await programModel.countDocuments(queryObject);
+    
+        const programs = await programModel
+          .find(queryObject)
+          .select("_id"); // Select specific fields if provided in the query
+    
+          const programIds = programs.map(program => program._id);
+          const applications = await applicationModel.find({ programId: { $in: programIds } });
+          
+        // Prepare data for export
+        const dataset = applications.map((app) => ({
+            'Student Name (Arabic)': app.arabicName,
+            'Student Name (English)': app.englishName,
+            'Student ID': app.studentId,
+            'Email': app.email,
+            'Phone': app.phone,
+            'Grade English 1': app.gradeEnglish1,
+            'Grade English 2': app.gradeEnglish2,
+            'GBA': app.gba,
+            'Hours Passed': app.hoursPassed,
+            'Year': app.year,
+            'Field Trainings Passed': app.fieldTrainingsPassed,
+            'Notes': app.notes,
+            'Branch': app.branch,
+            'Gender': app.gender,
+            'Major': app.major,
+            'Registered This Semester': app.isRegisteredThisSemester ? 'Yes' : 'No',
+            'Has Disciplinary Actions': app.hasDisciplinaryActions ? 'Yes' : 'No',
+            'Nationality': app.nationality,
+            'Passport Info': app.passportInfo,
+            'Is Passport Valid': app.isPassportValid ? 'Yes' : 'No',
+            'Academic Degree': app.academicDegree,
+            'Has Travel Restrictions': app.hasTravelRestrictions ? 'Yes' : 'No',
+            'Has EU Visa': app.hasEUVisa ? 'Yes' : 'No',
+            'Visa Details': app.visaDetails,
+            'Status': app.status,
+            'Enrollment Status':app.enrollmentStatus,
+        }));
+
+        const csv = parse(dataset);
+
+        const bom = '\ufeff';
+        const csvWithBom = bom + csv;
+
+        const buffer = iconv.encode(csvWithBom, 'utf-8');
+
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', 'attachment; filename=applications.csv');
+
+        res.end(buffer);
+
+    } catch (error) {
+        console.error("Error exporting applications:", error);
+        res.status(500).json({ message: "Failed to export applications" });
+    }
+};
+
+
 
 export const addProgramType = async (req, res, next) => {
     try {

@@ -186,7 +186,7 @@ if (req.query.status) {
   }
 };
 
-//make sure this works very important 
+//make sure this works very important
 
 export const getInstructorPrograms = async (req, res, next) => {
   try {
@@ -216,6 +216,7 @@ export const getInstructorPrograms = async (req, res, next) => {
     next(error); // Pass errors to the error-handling middleware
   }
 };
+
 export const getProgramById = async (req, res) => {
     try {
 

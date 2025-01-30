@@ -16,4 +16,6 @@ router.patch('/:id/enrollment-status', validation(schema.updateEnrollmentStatusS
 router.delete('/', validation(schema.deleteByStatusSchema), auth(endpoints.delete), asyncHandler(controller.deleteByStatus));
 router.delete('/:id', validation(schema.deleteApplicationSchema), auth(endpoints.delete), asyncHandler(controller.deleteApplication));
 
+router.get("/export", asyncHandler(controller.exportApplicationsToCSV));
+
 export default router;
