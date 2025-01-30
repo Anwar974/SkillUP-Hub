@@ -7,5 +7,6 @@ export const endpoints ={
     updateStatus : [roles.Instructor],
     delete: [roles.User,roles.Instructor],
     myApplication: [roles.User],
+    exportData :[roles.Instructor],
 
 }
