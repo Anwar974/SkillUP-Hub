@@ -203,7 +203,6 @@ export const getMyApplications = async (req, res) => {
     try { 
         
         const applications = await applicationModel.find({userId:req.user._id })
-        .select("arabicName englishName email appliedAt status enrollmentStatus programType programId")
         .populate('programId','title');
 
 
@@ -242,7 +241,7 @@ export const getMyApplications = async (req, res) => {
 
 
 
-        
+
         return res.status(200).json({ applications });
     } catch (error) {
         console.error(error);
