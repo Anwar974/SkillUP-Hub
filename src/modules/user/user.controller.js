@@ -206,6 +206,43 @@ export const getMyApplications = async (req, res) => {
         .select("arabicName englishName email appliedAt status enrollmentStatus programType programId")
         .populate('programId','title');
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
         return res.status(200).json({ applications });
     } catch (error) {
         console.error(error);

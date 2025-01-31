@@ -80,9 +80,7 @@ export const deleteReview = async (req, res) => {
         const userId = req.user._id;
 
         // Log inputs for debugging
-        console.log("User ID:", userId);
-        console.log("Program ID:", programId);
-
+     
         // Find and delete the review
         const deletedReview = await reviewModel.findOneAndDelete({ userId, programId });
 
