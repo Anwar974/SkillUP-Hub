@@ -107,7 +107,7 @@ export const getCompanies = async (req, res, next) => {
       const companiesWithProgramCounts = await Promise.all(
         companies.map(async (company) => {
           const programCount = await programModel.countDocuments({
-            company: company._id, // Ensure this matches your schema
+            company: company._id, status: "Active"
           });
           return { ...company.toObject(), programCount };
         })
@@ -138,7 +138,7 @@ export const getCompanyById = async (req, res) => {
         // Fetch associated programs and count
 
         // Fetch associated programs for this company
-        const programs = await programModel.find({ company: company._id }).populate('categoryId');
+        const programs = await programModel.find({ company: company._id, status: "Active" }).populate('categoryId');
 
         res.status(200).json({ company, programs, programCount: programs.length });
         
@@ -256,7 +256,7 @@ export const deleteCompany = async (req, res) => {
         return res.status(404).json({ message: "company not found" });
     }
 
-    const programs = await programModel.find({ company: company._id });
+    const programs = await programModel.find({ company: company._id, status: "Active" });
     if (programs.length > 0) {
       company.status = "NotActive";
       await company.save();
@@ -288,7 +288,7 @@ export const destroy = async (req, res) => {
       return res.status(404).json({ message: "Category not found" });
     }
 
-    const programs = await programModel.find({ categoryId: category._id });
+    const programs = await programModel.find({ categoryId: category._id, status: "Active" });
     if (programs.length > 0) {
       category.status = "NotActive"; // Adjust the field name and value as per your schema
       await category.save();

@@ -47,7 +47,7 @@ export const getAll = async (req, res) => {
         const categoriesWithProgramCount = await Promise.all(
             categories.map(async (category) => {
                 const programCount = await programModel.countDocuments({
-                    categoryId: category._id // Assuming program has a categoryId field
+                    categoryId: category._id , status: "Active"
                 });
 
                 return {
@@ -126,6 +126,9 @@ export const getName=async(req,res,next)=>{
           programQuery.$and = [...(programQuery.$and || []), { $or: statusFilters }];
         }
       }
+
+      programQuery.status = "Active"; 
+
   
       // Find the category and apply program filtering
       const category = await categoryModel.findById(id).populate({
@@ -157,7 +160,7 @@ export const getName=async(req,res,next)=>{
       );
   
       // Fetch associated programs and count
-      const programCount = await programModel.countDocuments({ categoryId: category._id });
+      const programCount = await programModel.countDocuments({ categoryId: category._id, status: "Active" });
   
       return res.status(200).json({
         message: "success", 
