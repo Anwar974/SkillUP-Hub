@@ -94,6 +94,11 @@ const applicationSchema = new Schema({
         enum:['Pending','Rejected','Accepted'],
 
     },
+    isDeleted: {
+        type: String,
+        default: "false",  // Default is not deleted
+        enum: ["true", "false"], // More intuitive boolean-like values
+    },
     programType: {
         type: String,
         required: true

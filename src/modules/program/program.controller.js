@@ -95,6 +95,8 @@ export const getPrograms = async (req, res, next) => {
     queryObject = JSON.parse(queryObject);
 
 
+    queryObject.status = "Active"; // Ensures only active programs are fetched
+
     if (req.query.search) {
       queryObject.$or = [
         { title: { $regex: req.query.search, $options: "i" } },
@@ -200,6 +202,8 @@ export const getInstructorPrograms = async (req, res, next) => {
 
     // Query to find programs created by the user
     const queryObject = { createdBy: userId };
+    queryObject.status = "Active"; 
+
 
     // Count the number of programs created by the user
     const count = await programModel.countDocuments(queryObject);

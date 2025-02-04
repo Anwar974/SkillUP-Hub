@@ -205,43 +205,6 @@ export const getMyApplications = async (req, res) => {
         const applications = await applicationModel.find({userId:req.user._id })
         .populate('programId','title');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         return res.status(200).json({ applications });
     } catch (error) {
         console.error(error);

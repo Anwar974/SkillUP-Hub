@@ -7,7 +7,7 @@ import { enrollmentStatusChangeEmailTemplate, statusChangeEmailTemplate } from "
 import { ApplicationsPagination } from "../../ults/pagination.js";
 
 import { parse } from 'json2csv';
-import iconv from 'iconv-lite'; // Encoding conversion
+import iconv from 'iconv-lite'; 
 
 export const getInstructorPrograms = async (req, res, next) => {
     try {
@@ -19,7 +19,8 @@ export const getInstructorPrograms = async (req, res, next) => {
       }
   
       const queryObject = { createdBy: userId };
-  
+      queryObject.status = "Active";
+
       const count = await programModel.countDocuments(queryObject);
   
       const programs = await programModel
@@ -33,7 +34,7 @@ export const getInstructorPrograms = async (req, res, next) => {
     } catch (error) {
       next(error);
     }
-  };
+};
   
 export const exportApplicationsToCSV = async (req, res) => {
     try {
@@ -41,7 +42,8 @@ export const exportApplicationsToCSV = async (req, res) => {
         // Fetch applications from the database
         const userId =req.user._id;
         const queryObject = { createdBy: userId };
-  
+        queryObject.status = "Active"; // Ensures only active programs are fetched
+
     
         const programs = await programModel
           .find(queryObject)
@@ -98,14 +100,13 @@ export const exportApplicationsToCSV = async (req, res) => {
     }
 };
 
-
 export const exportApplicationsByProgram = async (req, res) => {
     try{
     const { programId } = req.params;
   
     const program = await programModel.findById(programId).select("_id type"); 
 
-          const applications = await applicationModel.find({ programId });
+    const applications = await applicationModel.find({ programId });
    
     let dataset;
     
@@ -290,8 +291,6 @@ export const postApplication = async (req, res) => {
     }
 };
 
-
-
 export const getApplicationsByProgram = async (req, res) => {
     
     const { programId } = req.params;
@@ -314,6 +313,7 @@ export const getApplicationsByProgram = async (req, res) => {
       (match) => `$${match}`
     );
     queryObject = JSON.parse(queryObject);
+
   
     if (req.query.search) {
       queryObject.$or = [
@@ -333,6 +333,10 @@ export const getApplicationsByProgram = async (req, res) => {
     if (req.query.fieldTrainingsPassed) {
         queryObject.fieldTrainingsPassed = { $regex: req.query.fieldTrainingsPassed, $options: "i" };
     }
+
+    queryObject.isDeleted = "false";
+
+
   
     const mongoseQuery = applicationModel.find(queryObject).skip(skip).limit(limit);
   
@@ -510,26 +514,60 @@ export const updateEnrollmentStatus = async (req, res) => {
 };
 
 export const deleteByStatus = async (req, res) => {
-    
     const { programId } = req.params;
     const { status } = req.body; // Assuming status is provided in the request body
 
-    const applications = await applicationModel.deleteMany({ programId, status });
-    if (applications.deletedCount === 0) {
+    const applications = await applicationModel.updateMany(
+        { programId, status, isDeleted: "false" }, // Only update active applications
+        { $set: { isDeleted: "true" } } // Mark as deleted
+    );
+
+    if (applications.modifiedCount === 0) {
         return res.status(404).json({ message: "No applications found with the specified status" });
     }
-    return res.status(200).json({ message: "Applications deleted successfully" });
-  
-   
+    
+    return res.status(200).json({ message: "Applications marked as deleted successfully" });
 };
 
 export const deleteApplication = async (req, res) => {
+    const { programId, id } = req.params;
     
-        const { programId, id } = req.params;
-        const application = await applicationModel.findOneAndDelete({ _id: id, programId });
-        if (!application) {
-            return res.status(404).json({ message: "Application not found" });
-        }
-        return res.status(200).json({ message: "Application deleted successfully" });
-   
+    const application = await applicationModel.findOneAndUpdate(
+        { _id: id, programId, isDeleted: "false" }, // Ensure only active applications are updated
+        { $set: { isDeleted: "true" } }, // Mark as deleted
+        { new: true }
+    );
+
+    if (!application) {
+        return res.status(404).json({ message: "Application not found or already deleted" });
+    }
+
+    return res.status(200).json({ message: "Application marked as deleted successfully" });
 };
+
+
+
+// export const deleteByStatus = async (req, res) => {
+    
+//     const { programId } = req.params;
+//     const { status } = req.body; // Assuming status is provided in the request body
+
+//     const applications = await applicationModel.deleteMany({ programId, status });
+//     if (applications.deletedCount === 0) {
+//         return res.status(404).json({ message: "No applications found with the specified status" });
+//     }
+//     return res.status(200).json({ message: "Applications deleted successfully" });
+  
+   
+// };
+
+// export const deleteApplication = async (req, res) => {
+    
+//         const { programId, id } = req.params;
+//         const application = await applicationModel.findOneAndDelete({ _id: id, programId });
+//         if (!application) {
+//             return res.status(404).json({ message: "Application not found" });
+//         }
+//         return res.status(200).json({ message: "Application deleted successfully" });
+   
+// };

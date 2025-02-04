@@ -44,20 +44,20 @@ export const getAll = async (req, res) => {
             }
         ]);
                 // Count the number of programs for each category
-                const categoriesWithProgramCount = await Promise.all(
-                    categories.map(async (category) => {
-                        const programCount = await programModel.countDocuments({
-                            categoryId: category._id // Assuming program has a categoryId field
-                        });
+        const categoriesWithProgramCount = await Promise.all(
+            categories.map(async (category) => {
+                const programCount = await programModel.countDocuments({
+                    categoryId: category._id // Assuming program has a categoryId field
+                });
+
+                return {
+                    ...category.toObject(),
+                    programCount
+                };
+            })
+        );
         
-                        return {
-                            ...category.toObject(),
-                            programCount
-                        };
-                    })
-                );
-        
-                return res.status(200).json({ message: "success", categories: categoriesWithProgramCount });
+      return res.status(200).json({ message: "success", categories: categoriesWithProgramCount });
     } catch (error) {
         return res.status(500).json({ message: "error", error });
     }
