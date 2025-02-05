@@ -58,10 +58,10 @@ export const postCopmany = async (req, res) => {
 
 export const getCompanies = async (req, res, next) => {
     try {
-      const { skip, limit } = pagination(req.query.page, req.query.limit);
+      // const { skip, limit } = pagination(req.query.page, req.query.limit);
   
       let queryObject = { ...req.query };
-      const excludeQuery = ["page", "limit", "sort", "search", "fields"];
+      const excludeQuery = ["page", "sort", "search", "fields"];
       excludeQuery.forEach((ele) => {
         delete queryObject[ele];
       });
@@ -92,8 +92,6 @@ export const getCompanies = async (req, res, next) => {
       // Fetch companies
       let companies = await companyModel
         .find(queryObject)
-        .skip(skip)
-        .limit(limit)
         .sort(req.query.sort)
         .select(req.query.fields);
   
