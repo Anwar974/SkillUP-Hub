@@ -48,13 +48,15 @@ export const exportApplicationsToCSV = async (req, res) => {
           .find(queryObject)
           .select("_id type");
     
-          // Check if any program is either "local" or "international"
             const foundProgram = programs.find(program => program.type === "local" || program.type === "international");
             const programType = foundProgram.type; 
+
 
           const programIds = programs.map(program => program._id);
           const applications = await applicationModel.find({ programId: { $in: programIds } });
           
+        let dataset;
+
           if(programType === "international"){
             dataset= applications.map((app) => ({
                 'Student Name (Arabic)': app.arabicName,
