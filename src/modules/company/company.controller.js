@@ -8,14 +8,19 @@ import userModel from '../../../db/model/user.model.js';
 
 
 export const postCopmany = async (req, res) => {
+  console.log("🔥 Function postCopmany() is running...");
+
     try {
+
+      console.log("Incoming request body:", req.body);
+console.log("Incoming file:", req.file);
+console.log("User making the request:", req.user);
 
         req.body.companyName = req.body.companyName.toLowerCase();
 
         if(await companyModel.findOne({companyName:req.body.companyName})){
             return res.status(409).json({message:"company already exists"});
         }
-
          // Check if the email in socialLinks is unique
     if (req.body.socialLinks && req.body.socialLinks.email) {
       const existingCompany = await companyModel.findOne({
@@ -29,18 +34,14 @@ export const postCopmany = async (req, res) => {
       }
     }
 
-        req.body.slug = slugify(req.body.companyName);
+      req.body.slug = slugify(req.body.companyName);
 
-        const {secure_url,public_id} = await cloudinary.uploader.upload(req.file.path,{
-            folder:`${process.env.APPNAME}/companies`
-        })
-
-        req.body.image = {secure_url,public_id};
+     const {secure_url,public_id} = await cloudinary.uploader.upload
+     (req.file.path,{ folder:`${process.env.APPNAME}/companies` })
+         req.body.image = {secure_url,public_id};
 
         req.body.createdBy = req.user._id;
         req.body.updatedBy = req.user._id;
-
-        
 
         if (req.body.socialLinks) {
             req.body.socialLinks = {
@@ -174,7 +175,8 @@ export const updateCompany = async (req, res) => {
 
     try{
 
-    const { companyName, locations, socialLinks,industry,description,companySize,foundedIn } = req.body;
+    const { companyName, locations, socialLinks,
+      industry,description,companySize,foundedIn } = req.body;
 
     const company = await companyModel.findById(req.params.id);
     if (!company) {

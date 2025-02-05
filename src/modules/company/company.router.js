@@ -9,8 +9,14 @@ import fileUpload, { fileType } from '../../ults/multer.js';
 
 const router = Router();
 
-router.post('/',fileUpload(fileType.image).single('image'), validation(schema.postCompanySchema), auth(endpoints.post),
- asyncHandler(controller.postCopmany));
+router.post('/',fileUpload(fileType.image).single('image'),(err, req, res, next) => {
+    if (err) {
+        return res.status(400).json({ message: err.message });
+    }
+    next();  // Proceed to validation and further processing
+},
+ validation(schema.postCompanySchema), auth(endpoints.post), asyncHandler(controller.postCopmany));
+
 router.get('/', asyncHandler(controller.getCompanies));
 router.get('/:userId/companies',auth(endpoints.get), asyncHandler(controller.getInstructorCompanies));
 router.get('/:id', asyncHandler(controller.getCompanyById));
