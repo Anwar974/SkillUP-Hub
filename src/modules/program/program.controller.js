@@ -230,7 +230,7 @@ export const getProgramById = async (req, res) => {
                 path: 'review',
                 populate: {
                     path: 'userId', 
-                    select: 'userName' 
+                    select: 'userName image' 
                 }
             })
             .populate({
