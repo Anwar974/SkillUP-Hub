@@ -232,10 +232,9 @@ export const getProgramById = async (req, res) => {
                     path: 'userId', 
                     select: 'userName image' 
                 }
+            }).populate({
+              path: 'company',
             })
-            .populate({
-              path: 'company',  // Populate the company field
-          })
           .populate({
             path: 'createdBy',
             select: 'userName image'

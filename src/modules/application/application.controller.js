@@ -39,48 +39,74 @@ export const getInstructorPrograms = async (req, res, next) => {
 export const exportApplicationsToCSV = async (req, res) => {
     try {
 
-        // Fetch applications from the database
         const userId =req.user._id;
         const queryObject = { createdBy: userId };
-        queryObject.status = "Active"; // Ensures only active programs are fetched
+        queryObject.status = "Active";
 
     
         const programs = await programModel
           .find(queryObject)
-          .select("_id"); // Select specific fields if provided in the query
+          .select("_id type");
     
+          // Check if any program is either "local" or "international"
+            const foundProgram = programs.find(program => program.type === "local" || program.type === "international");
+            const programType = foundProgram.type; 
+
           const programIds = programs.map(program => program._id);
           const applications = await applicationModel.find({ programId: { $in: programIds } });
           
-        // Prepare data for export
-        const dataset = applications.map((app) => ({
-            'Student Name (Arabic)': app.arabicName,
-            'Student Name (English)': app.englishName,
-            'Student ID': app.studentId,
-            'Email': app.email,
-            'Phone': app.phone,
-            'Grade English 1': app.gradeEnglish1,
-            'Grade English 2': app.gradeEnglish2,
-            'GBA': app.gba,
-            'Hours Passed': app.hoursPassed,
-            'Year': app.year,
-            'Field Trainings Passed': app.fieldTrainingsPassed,
-            'Notes': app.notes,
-            'Branch': app.branch,
-            'Gender': app.gender,
-            'Major': app.major,
-            'Registered This Semester': app.isRegisteredThisSemester ? 'Yes' : 'No',
-            'Has Disciplinary Actions': app.hasDisciplinaryActions ? 'Yes' : 'No',
-            'Nationality': app.nationality,
-            'Passport Info': app.passportInfo,
-            'Is Passport Valid': app.isPassportValid ? 'Yes' : 'No',
-            'Academic Degree': app.academicDegree,
-            'Has Travel Restrictions': app.hasTravelRestrictions ? 'Yes' : 'No',
-            'Has EU Visa': app.hasEUVisa ? 'Yes' : 'No',
-            'Visa Details': app.visaDetails,
-            'Status': app.status,
-            'Enrollment Status':app.enrollmentStatus,
-        }));
+          if(programType === "international"){
+            dataset= applications.map((app) => ({
+                'Student Name (Arabic)': app.arabicName,
+                'Student Name (English)': app.englishName,
+                'Student ID': app.studentId,
+                'Email': app.email,
+                'Phone': app.phone,
+                'Grade English 1': app.gradeEnglish1,
+                'Grade English 2': app.gradeEnglish2,
+                'GBA': app.gba,
+                'Hours Passed': app.hoursPassed,
+                'Year': app.year,
+                'Field Trainings Passed': app.fieldTrainingsPassed,
+                'Notes': app.notes,
+                'Branch': app.branch,
+                'Gender': app.gender,
+                'Major': app.major,
+                'Registered This Semester': app.isRegisteredThisSemester ? 'Yes' : 'No',
+                'Has Disciplinary Actions': app.hasDisciplinaryActions ? 'Yes' : 'No',
+                'Nationality': app.nationality,
+                'Passport Info': app.passportInfo,
+                'Is Passport Valid': app.isPassportValid ? 'Yes' : 'No',
+                'Academic Degree': app.academicDegree,
+                'Has Travel Restrictions': app.hasTravelRestrictions ? 'Yes' : 'No',
+                'Has EU Visa': app.hasEUVisa ? 'Yes' : 'No',
+                'Visa Details': app.visaDetails,
+                'Status': app.status,
+                'Enrollment Status':app.enrollmentStatus,
+            }));
+        }else{
+            dataset= applications.map((app) => ({
+                'Student Name (Arabic)': app.arabicName,
+                'Student Name (English)': app.englishName,
+                'Student ID': app.studentId,
+                'Email': app.email,
+                'Phone': app.phone,
+                'Grade English 1': app.gradeEnglish1,
+                'Grade English 2': app.gradeEnglish2,
+                'GBA': app.gba,
+                'Hours Passed': app.hoursPassed,
+                'Year': app.year,
+                'Field Trainings Passed': app.fieldTrainingsPassed,
+                'Notes': app.notes,
+                'Branch': app.branch,
+                'Gender': app.gender,
+                'Major': app.major,
+                'Trainings Student Participated In':app.trainingsParticipatedIn,
+                'Awards Received':app.awardsReceived,
+                'Status': app.status,
+                'Enrollment Status':app.enrollmentStatus,
+            }));
+        }
 
         const csv = parse(dataset);
 
