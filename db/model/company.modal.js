@@ -54,7 +54,8 @@ const companySchema = new Schema({
         email:{
             type:String,
             required:false,
-            unique:true,
+            unique: true,
+             sparse: true
         },
         
     },

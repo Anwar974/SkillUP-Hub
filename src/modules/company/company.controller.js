@@ -8,20 +8,13 @@ import userModel from '../../../db/model/user.model.js';
 
 
 export const postCopmany = async (req, res) => {
-  console.log("🔥 Function postCopmany() is running...");
-
     try {
-
-      console.log("Incoming request body:", req.body);
-console.log("Incoming file:", req.file);
-console.log("User making the request:", req.user);
 
         req.body.companyName = req.body.companyName.toLowerCase();
 
         if(await companyModel.findOne({companyName:req.body.companyName})){
             return res.status(409).json({message:"company already exists"});
         }
-         // Check if the email in socialLinks is unique
     if (req.body.socialLinks && req.body.socialLinks.email) {
       const existingCompany = await companyModel.findOne({
         "socialLinks.email": req.body.socialLinks.email,
